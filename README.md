@@ -11,3 +11,12 @@ To Create the tables and populate them, run the files in the following order:
    * BookingData.sql
    * TicketData.sql
    * PassengerData.sql
+  
+Below is a screenshot of the ERD:
+
+![AltText](ERD.jpg)
+
+
+Below is a screenshot of the DSD:
+
+![AltText](DSD.jpg)
