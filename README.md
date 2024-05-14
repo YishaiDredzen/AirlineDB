@@ -1,13 +1,13 @@
 # AirlineDB
 Fake Airline Database for Database Project 
 
-To Create the tables and populate them:
+To Create the tables and populate them, run the files in the following order:
 
-    1. The Schema definition file CreateTblAirline.sql
-    2. The data for all the tables:
-        Flight
-        Package
-        CodeShare
-        Booking
-        Ticket
-        Passenger
+1. The Schema definition: **CreateTblAirline.sql**
+2. The data for all the tables are inserted:
+   * FlightData.sql
+   * PackageData.sql
+   * CodeShareData.sql
+   * BookingData.sql
+   * TicketData.sql
+   * PassengerData.sql
