@@ -15,45 +15,34 @@ CREATE TABLE Flight (
 
 CREATE TABLE Seat (
     FlightNumber INT,
-    SeatNumber VARCHAR(3) GENERATED ALWAYS AS (
-        CONCAT(
-            LPAD((FLOOR((ROW_NUMBER() OVER ()) - 1) % 60) + 1, 2, '0'),
-            CASE
-                WHEN (FLOOR((ROW_NUMBER() OVER ()) - 1) / 60) = 0 THEN 'A'
-                WHEN (FLOOR((ROW_NUMBER() OVER ()) - 1) / 60) = 1 THEN 'B'
-                WHEN (FLOOR((ROW_NUMBER() OVER ()) - 1) / 60) = 2 THEN 'C'
-                WHEN (FLOOR((ROW_NUMBER() OVER ()) - 1) / 60) = 3 THEN 'D'
-                WHEN (FLOOR((ROW_NUMBER() OVER ()) - 1) / 60) = 4 THEN 'F'
-                WHEN (FLOOR((ROW_NUMBER() OVER ()) - 1) / 60) = 5 THEN 'G'
-                WHEN (FLOOR((ROW_NUMBER() OVER ()) - 1) / 60) = 6 THEN 'H'
-                WHEN (FLOOR((ROW_NUMBER() OVER ()) - 1) / 60) = 7 THEN 'J'
-                WHEN (FLOOR((ROW_NUMBER() OVER ()) - 1) / 60) = 8 THEN 'K'
-            END
-        )
-    ) STORED,
+    SeatNumber VARCHAR(3) NOT NULL,
     PRIMARY KEY (FlightNumber, SeatNumber),
     FOREIGN KEY (FlightNumber) REFERENCES Flight(FlightNumber),
     CONSTRAINT chk_seat_number CHECK (SeatNumber ~ '^[0-5][0-9][A|B|C|D|F|G|H|J|K]$')
+);
+
+CREATE TABLE Ticket (
+    TicketNumber SERIAL PRIMARY KEY,
+    FlightNumber INT,
+    SeatNumber VARCHAR(3),
+    Price FLOAT,
+    Status ticket_status,
+    Class ticket_class,
+    PassengerID INT,
+    FOREIGN KEY (FlightNumber) REFERENCES Flight(FlightNumber),
+    FOREIGN KEY (FlightNumber, SeatNumber) REFERENCES Seat(FlightNumber, SeatNumber),
+    FOREIGN KEY (PassengerID) REFERENCES Passenger(PassengerID)
 );
 
 CREATE TABLE Booking (
     BookingID SERIAL PRIMARY KEY,
     PassengerID INT,
     BookingDate DATE,
-    Status VARCHAR,
+    Status booking_status,
     Cost FLOAT,
     TicketNumber INT,
     FOREIGN KEY (PassengerID) REFERENCES Passenger(PassengerID),
     FOREIGN KEY (TicketNumber) REFERENCES Ticket(TicketNumber)
-);
-
-CREATE TABLE Ticket (
-    TicketNumber SERIAL PRIMARY KEY,
-    FlightNumber INT,
-    Price FLOAT,
-    Status VARCHAR,
-    Class VARCHAR,
-    FOREIGN KEY (FlightNumber) REFERENCES Flight(FlightNumber)
 );
 
 CREATE TABLE Package (
@@ -65,6 +54,7 @@ CREATE TABLE Package (
     ReturnDate DATE NOT NULL
 );
 
+
 CREATE TABLE CodeShare (
     CodeShareID SERIAL PRIMARY KEY,
     FlightNumber INT,
@@ -72,3 +62,6 @@ CREATE TABLE CodeShare (
     Restrictions VARCHAR NOT NULL,
     FOREIGN KEY (FlightNumber) REFERENCES Flight(FlightNumber)
 );
+
+ALTER SEQUENCE flight_flightnumber_seq START WITH 1000;
+ALTER SEQUENCE ticket_ticketnumber_seq START WITH 100;
