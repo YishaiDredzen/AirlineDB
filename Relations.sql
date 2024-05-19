@@ -7,8 +7,8 @@ CREATE TABLE PassengerBooking (
 );
 
 CREATE TABLE BookingPackage (
-    BookingID INT NOT NULL,
-    PackageID INT NOT NULL,
+    BookingID INT,
+    PackageID INT,
     PRIMARY KEY (BookingID, PackageID),
     FOREIGN KEY (BookingID) REFERENCES Booking(BookingID),
     FOREIGN KEY (PackageID) REFERENCES Package(PackageID)
