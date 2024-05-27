@@ -50,7 +50,9 @@ seat_letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K']
 
 for ticket_number in range(1, 200001):
     flight_number = random.randint(1, 2000)  # Assuming there are 2000 flights
-    seat_number = f"{random.choice(seat_rows)}{random.choice(seat_letters)}"
+    seat_row = random.choice(seat_rows)
+    seat_letter = random.choice(seat_letters)
+    seat_number = f"{seat_row:02d}{seat_letter}"  # Pad seat row to 2 digits
     price = round(random.uniform(50, 1000), 2)  # Random price between 50 and 1000
     passenger_id = random.choice(unique_passenger_ids)  # Pick a random passenger ID
     
@@ -59,7 +61,6 @@ for ticket_number in range(1, 200001):
         continue
     
     # Determine ticket class based on seat row
-    seat_row = int(seat_number[:-1])
     ticket_class = random_ticket_class(seat_row)
     
     # Check if the number of tickets exceeds the flight capacity
