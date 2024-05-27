@@ -62,6 +62,3 @@ CREATE TABLE CodeShare (
     Restrictions VARCHAR NOT NULL,
     FOREIGN KEY (FlightNumber) REFERENCES Flight(FlightNumber)
 );
-
-ALTER SEQUENCE flight_flightnumber_seq START WITH 1000;
-ALTER SEQUENCE ticket_ticketnumber_seq START WITH 100;
