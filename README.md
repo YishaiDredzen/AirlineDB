@@ -5,7 +5,7 @@ As a class, we decided to create a database for an airline company. Each group h
 We took the booking and tickets part where passenger's (customer's) bookings are managed in the database. 
 In addition to flights, we offer package deals where customer's can rent cars through our service.
 
-## Creating the Database
+### Creating the Database
 To Create the tables and populate them, run the files in the following order:
 
 1. First, run the **Enums.sql** script to create enums on local system
