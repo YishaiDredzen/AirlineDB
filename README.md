@@ -29,3 +29,6 @@ Below is a screenshot of the ERD:
 Below is a screenshot of the DSD:
 
 ![AltText](DSD.jpg)
+
+
+A full documentation can be found in the Stage1 and Stage2 pdf files.
