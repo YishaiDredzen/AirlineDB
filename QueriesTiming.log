@@ -1,3 +1,4 @@
+------------------------------------------------------------------------------------------------------------------------------------------
 -- Query 1
 
 HashAggregate  (cost=4239.03..4239.67 rows=51 width=60) (actual time=36.587..36.607 rows=51 loops=1)
@@ -17,6 +18,8 @@ HashAggregate  (cost=4239.03..4239.67 rows=51 width=60) (actual time=36.587..36.
  Execution Time: 36.779 ms
 (15 rows)
 
+------------------------------------------------------------------------------------------------------------------------------------------
+
 -- Query 2
  Sort  (cost=3242.23..3247.23 rows=2000 width=12) (actual time=21.824..21.896 rows=1999 loops=1)
    Sort Key: (avg(price)) DESC
@@ -33,6 +36,7 @@ HashAggregate  (cost=4239.03..4239.67 rows=51 width=60) (actual time=36.587..36.
  Execution Time: 22.100 ms
 (13 rows)
 
+------------------------------------------------------------------------------------------------------------------------------------------
 -- Query 3
 
  Gather  (cost=4538.87..7772.80 rows=5244 width=31) (actual time=46.308..73.770 rows=5088 loops=1)
@@ -62,7 +66,7 @@ HashAggregate  (cost=4239.03..4239.67 rows=51 width=60) (actual time=36.587..36.
  Execution Time: 74.296 ms
 (25 rows)
 
-
+------------------------------------------------------------------------------------------------------------------------------------------
 -- Query 4
 
  Sort  (cost=4801.10..4826.10 rows=10000 width=26) (actual time=47.187..48.356 rows=9886 loops=1)
@@ -83,6 +87,7 @@ HashAggregate  (cost=4239.03..4239.67 rows=51 width=60) (actual time=36.587..36.
  Execution Time: 49.451 ms
 (16 rows)
 
+------------------------------------------------------------------------------------------------------------------------------------------
 
 -- Query 5
 
@@ -96,9 +101,51 @@ HashAggregate  (cost=4239.03..4239.67 rows=51 width=60) (actual time=36.587..36.
  Execution Time: 7.690 ms
 (8 rows)
 
-
+------------------------------------------------------------------------------------------------------------------------------------------
 -- Query 6
 
+------------------------------------------------------------------------------------------------------------------------------------------
 
 -- Query 7
+
+ Update on ticket  (cost=5.06..2710.16 rows=0 width=0) (actual time=5.222..5.223 rows=0 loops=1)
+   ->  Nested Loop  (cost=5.06..2710.16 rows=797 width=16) (actual time=0.136..0.812 rows=268 loops=1)
+         ->  Seq Scan on flight  (cost=0.00..52.98 rows=10 width=10) (actual time=0.040..0.491 rows=4 loops=1)
+               Filter: ((departuretime)::date = '2024-07-01'::date)
+               Rows Removed by Filter: 1995
+         ->  Bitmap Heap Scan on ticket  (cost=5.06..264.73 rows=99 width=10) (actual time=0.042..0.066 rows=67 loops=4)               Recheck Cond: (flightnumber = flight.flightnumber)
+               Heap Blocks: exact=15
+               ->  Bitmap Index Scan on idx_ticket_flightnumber_status  (cost=0.00..5.04 rows=99 width=0) (actual time=0.036..0.036 rows=67 loops=4)
+                     Index Cond: (flightnumber = flight.flightnumber)
+ Planning Time: 7.625 ms
+ Execution Time: 5.427 ms
+(12 rows)
+
+------------------------------------------------------------------------------------------------------------------------------------------
 -- Query 8
+
+ Update on ticket  (cost=350.17..358.18 rows=0 width=0) (actual time=0.088..0.089 rows=0 loops=1)
+   InitPlan 2 (returns $1)
+     ->  Index Only Scan using seat_pkey on seat  (cost=8.86..16.88 rows=1 width=0) (actual time=0.086..0.086 rows=0 loops=1)
+           Index Cond: ((flightnumber = $0) AND (seatnumber = '12A'::text))
+           Heap Fetches: 0
+           InitPlan 1 (returns $0)
+             ->  Index Scan using ticket_pkey on ticket ticket_1  (cost=0.42..8.44 rows=1 width=4) (actual time=0.054..0.055 rows=1 loops=1)
+                   Index Cond: (ticketnumber = 1)
+   InitPlan 4 (returns $3)
+     ->  Bitmap Heap Scan on ticket ticket_3  (cost=13.48..332.87 rows=1 width=0) (never executed)
+           Recheck Cond: (flightnumber = $2)
+           Filter: ((seatnumber)::text = '12A'::text)
+           InitPlan 3 (returns $2)
+             ->  Index Scan using ticket_pkey on ticket ticket_2  (cost=0.42..8.44 rows=1 width=4) (never executed)
+                   Index Cond: (ticketnumber = 1)
+           ->  Bitmap Index Scan on idx_ticket_flightnumber_status  (cost=0.00..5.04 rows=99 width=0) (never executed)
+                 Index Cond: (flightnumber = $2)
+   ->  Result  (cost=0.42..8.44 rows=1 width=22) (actual time=0.087..0.087 rows=0 loops=1)
+         One-Time Filter: ($1 AND (NOT $3))
+         ->  Index Scan using ticket_pkey on ticket  (cost=0.42..8.44 rows=1 width=6) (never executed)
+               Index Cond: (ticketnumber = 1)
+ Planning Time: 0.419 ms
+ Execution Time: 0.152 ms
+(23 rows)
+------------------------------------------------------------------------------------------------------------------------------------------
