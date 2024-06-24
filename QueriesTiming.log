@@ -1,0 +1,104 @@
+-- Query 1
+
+HashAggregate  (cost=4239.03..4239.67 rows=51 width=60) (actual time=36.587..36.607 rows=51 loops=1)
+   Group Key: f.flightnumber
+   Batches: 1  Memory Usage: 32kB
+   ->  Hash Right Join  (cost=28.95..4213.65 rows=5075 width=60) (actual time=0.693..35.416 rows=5042 loops=1)
+         Hash Cond: (t.flightnumber = f.flightnumber)
+         ->  Seq Scan on ticket t  (cost=0.00..3661.39 rows=198939 width=8) (actual time=0.019..15.790 rows=198939 loops=1)
+         ->  Hash  (cost=28.31..28.31 rows=51 width=56) (actual time=0.654..0.656 rows=51 loops=1)
+               Buckets: 1024  Batches: 1  Memory Usage: 13kB
+               ->  Bitmap Heap Scan on flight f  (cost=4.67..28.31 rows=51 width=56) (actual time=0.543..0.635 rows=51 loops=1)
+                     Recheck Cond: ((departurelocation)::text = 'New York, USA'::text)
+                     Heap Blocks: exact=22
+                     ->  Bitmap Index Scan on idx_flight_departurelocation  (cost=0.00..4.66 rows=51 width=0) (actual time=0.535..0.535 rows=51 loops=1)
+                           Index Cond: ((departurelocation)::text = 'New York, USA'::text)
+ Planning Time: 9.152 ms
+ Execution Time: 36.779 ms
+(15 rows)
+
+-- Query 2
+ Sort  (cost=3242.23..3247.23 rows=2000 width=12) (actual time=21.824..21.896 rows=1999 loops=1)
+   Sort Key: (avg(price)) DESC
+   Sort Method: quicksort  Memory: 127kB
+   ->  HashAggregate  (cost=3107.57..3132.57 rows=2000 width=12) (actual time=21.141..21.387 rows=1999 loops=1)
+         Group Key: flightnumber
+         Batches: 1  Memory Usage: 625kB
+         ->  Bitmap Heap Scan on ticket  (cost=571.12..2860.58 rows=49397 width=12) (actual time=4.057..10.549 rows=49024 loops=1)
+               Recheck Cond: (class = 'Business'::ticket_class)
+               Heap Blocks: exact=1664
+               ->  Bitmap Index Scan on idx_ticket_class_flightnumber  (cost=0.00..558.77 rows=49397 width=0) (actual time=3.872..3.872 rows=49024 loops=1)
+                     Index Cond: (class = 'Business'::ticket_class)
+ Planning Time: 0.274 ms
+ Execution Time: 22.100 ms
+(13 rows)
+
+-- Query 3
+
+ Gather  (cost=4538.87..7772.80 rows=5244 width=31) (actual time=46.308..73.770 rows=5088 loops=1)
+   Workers Planned: 1
+   Workers Launched: 1
+   ->  Hash Join  (cost=3538.87..6248.40 rows=3085 width=31) (actual time=23.477..45.517 rows=2544 loops=2)
+         Hash Cond: (b.passengerid = p.passengerid)
+         ->  Parallel Hash Join  (cost=3230.87..5932.30 rows=3085 width=4) (actual time=20.093..40.960 rows=2544 loops=2)
+               Hash Cond: (b.ticketnumber = t.ticketnumber)
+               ->  Parallel Seq Scan on booking b  (cost=0.00..2352.94 rows=88094 width=8) (actual time=0.008..7.173 rows=74880 loops=2)
+               ->  Parallel Hash  (cost=3179.64..3179.64 rows=4098 width=4) (actual time=19.986..19.993 rows=3421 loops=2)
+                     Buckets: 8192  Batches: 1  Memory Usage: 384kB
+                     ->  Hash Join  (cost=29.57..3179.64 rows=4098 width=4) (actual time=0.135..19.039 rows=3421 loops=2)
+                           Hash Cond: (t.flightnumber = f.flightnumber)
+                           ->  Parallel Seq Scan on ticket t  (cost=0.00..2842.23 rows=117023 width=8) (actual time=0.007..8.024 rows=99470 loops=2)
+                           ->  Hash  (cost=28.70..28.70 rows=70 width=4) (actual time=0.115..0.120 rows=69 loops=2)
+                                 Buckets: 1024  Batches: 1  Memory Usage: 11kB
+                                 ->  Bitmap Heap Scan on flight f  (cost=4.82..28.70 rows=70 width=4) (actual time=0.050..0.102 rows=69 loops=2)
+                                       Recheck Cond: ((arrivallocation)::text = 'London, UK'::text)
+                                       Heap Blocks: exact=22
+                                       ->  Bitmap Index Scan on idx_flight_arrivallocation  (cost=0.00..4.80 rows=70 width=0) (actual time=0.041..0.041 rows=69 loops=2)
+                                             Index Cond: ((arrivallocation)::text = 'London, UK'::text)
+         ->  Hash  (cost=183.00..183.00 rows=10000 width=35) (actual time=3.283..3.284 rows=10000 loops=2)
+               Buckets: 16384  Batches: 1  Memory Usage: 802kB
+               ->  Seq Scan on passenger p  (cost=0.00..183.00 rows=10000 width=35) (actual time=0.242..1.572 rows=10000 loops=2)
+ Planning Time: 16.124 ms
+ Execution Time: 74.296 ms
+(25 rows)
+
+
+-- Query 4
+
+ Sort  (cost=4801.10..4826.10 rows=10000 width=26) (actual time=47.187..48.356 rows=9886 loops=1)
+   Sort Key: (sum(b.cost)) DESC
+   Sort Method: quicksort  Memory: 909kB
+   ->  HashAggregate  (cost=4036.72..4136.72 rows=10000 width=26) (actual time=39.244..41.802 rows=9886 loops=1)
+         Group Key: p.passengerid
+         Batches: 1  Memory Usage: 1425kB
+         ->  Hash Join  (cost=308.00..3784.47 rows=50449 width=26) (actual time=2.500..29.166 rows=50132 loops=1)
+               Hash Cond: (b.passengerid = p.passengerid)
+               ->  Seq Scan on booking b  (cost=0.00..3343.99 rows=50449 width=12) (actual time=0.029..16.351 rows=50132 loops=1)
+                     Filter: (status = 'Complete'::booking_status)
+                     Rows Removed by Filter: 99627
+               ->  Hash  (cost=183.00..183.00 rows=10000 width=18) (actual time=2.407..2.409 rows=10000 loops=1)
+                     Buckets: 16384  Batches: 1  Memory Usage: 620kB
+                     ->  Seq Scan on passenger p  (cost=0.00..183.00 rows=10000 width=18) (actual time=0.008..1.041 rows=10000 loops=1)
+ Planning Time: 9.808 ms
+ Execution Time: 49.451 ms
+(16 rows)
+
+
+-- Query 5
+
+ Aggregate  (cost=1995.52..1995.53 rows=1 width=8) (actual time=7.463..7.464 rows=1 loops=1)
+   CTE deletedbookings
+     ->  Delete on booking  (cost=0.29..1995.50 rows=1 width=6) (actual time=7.457..7.458 rows=0 loops=1)
+           ->  Index Scan using idx_booking_passenger_status on booking  (cost=0.29..1995.50 rows=1 width=6) (actual time=7.454..7.454 rows=0 loops=1)
+                 Index Cond: (status = 'Cancelled'::booking_status)
+   ->  CTE Scan on deletedbookings  (cost=0.00..0.02 rows=1 width=0) (actual time=7.460..7.460 rows=0 loops=1)
+ Planning Time: 0.118 ms
+ Execution Time: 7.690 ms
+(8 rows)
+
+
+-- Query 6
+
+
+-- Query 7
+-- Query 8
