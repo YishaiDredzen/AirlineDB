@@ -1,5 +1,5 @@
 # Airline Database - Ticketing Service
-Fake Airline Database for Database Project 
+Fake Airline Database for Database Project. 
 
 As a class, we decided to create a database for an airline company. Each group has taken a different part of the database.
 We took the booking and tickets part where passenger's (customer's) bookings are managed in the database. 
