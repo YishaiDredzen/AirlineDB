@@ -9,7 +9,7 @@ In addition to flights, we offer package deals where customer's can rent cars th
 To Create the tables and populate them, run the files in the following order:
 
 1. First, run the **Enums.sql** script to create enums on local system
-2. The Schema definition: **Tables.sql** and **Relations.sql**
+2. The Schema definition: **Tables.sql**
 3. For generating random data, run the scripts in Data Generation folder in the following order:
    * TicketGen.py
    * FlightGen.py
