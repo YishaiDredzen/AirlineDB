@@ -30,6 +30,7 @@ Below is a screenshot of the DSD:
 ![AltText](DSD.jpg)
 
 The enums in the database are:
+
 **ticket_class:** 'Economy', 'EconPlus', 'Business', 'First'
 **ticket_status:** 'Booked', 'Cancelled', 'CheckedIn', 'Boarded', 'InFlight', 'Landed', 'NoShow' 
 **booking_status:** 'Confirmed', 'Cancelled', 'Pending', 'Complete'
