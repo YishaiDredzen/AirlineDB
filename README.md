@@ -203,9 +203,58 @@ AND NOT EXISTS (
 **Parameterized Queries:**
 
 9. Find flights departing on a specific date with available seats
+```
+PREPARE available_flights_by_date (DATE) AS
+SELECT f.FlightNumber, f.DepartureLocation, f.ArrivalLocation, f.DepartureTime, f.ArrivalTime, f.Capacity - COUNT(t.TicketNumber) AS AvailableSeats
+FROM Flight f
+LEFT JOIN Ticket t ON f.FlightNumber = t.FlightNumber
+WHERE f.DepartureTime::date = $1
+GROUP BY f.FlightNumber
+HAVING f.Capacity - COUNT(t.TicketNumber) > 0;
+```
+```
+EXECUTE available_flights_by_date('2024-07-01');
+```
 10. Update ticket status based on user input and ensure the ticket exists
+```
+PREPARE update_ticket_status (ticket_status, int) AS
+UPDATE Ticket
+SET Status = $1
+WHERE TicketNumber = $2
+AND EXISTS (
+    SELECT 1
+    FROM Ticket
+    WHERE TicketNumber = $2
+);
+```
+```
+EXECUTE update_ticket_status('Booked', 1234);
+```
 11. Delete bookings for a given passenger and return the count of deleted rows
+```
+PREPARE delete_bookings_and_count (int) AS
+WITH DeletedBookings AS (
+    DELETE FROM Booking
+    WHERE PassengerID = $1
+    RETURNING *
+)
+SELECT COUNT(*) AS DeletedRows FROM DeletedBookings;
+```
+```
+EXECUTE delete_bookings_and_count(123);
+```
 12. Calculate the total cost of bookings within a date range for a specific passenger
+```
+PREPARE total_cost_by_passenger_and_date_range (int, date, date) AS
+SELECT PassengerID, SUM(Cost) AS TotalCost
+FROM Booking
+WHERE PassengerID = $1
+AND BookingDate BETWEEN $2 AND $3
+GROUP BY PassengerID;
+```
+```
+EXECUTE total_cost_by_passenger_and_date_range(123, '2023-01-01', '2023-12-31');
+```
 
 The actual queries can be found in [Queries](queries.sql) (1-8) and [Paramaterised Queries](ParamQueries.sql) (9-12) files.
 The detailed timings for the [Queries](QueriesTiming.log) and [Parameterised Queries](ParamQueriesTiming.log).
