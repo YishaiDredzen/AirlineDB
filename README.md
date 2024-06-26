@@ -18,7 +18,6 @@ To Create the tables and populate them, run the files in the following order:
    * BookingGen.py
    * PackageGen.py
    * CodeShareGen.py
-   * Relations.py
 
   
 Below is a screenshot of the ERD:
