@@ -32,7 +32,9 @@ Below is a screenshot of the DSD:
 The enums in the database are:
 
 **ticket_class:** 'Economy', 'EconPlus', 'Business', 'First'
-**ticket_status:** 'Booked', 'Cancelled', 'CheckedIn', 'Boarded', 'InFlight', 'Landed', 'NoShow' 
+
+**ticket_status:** 'Booked', 'Cancelled', 'CheckedIn', 'Boarded', 'InFlight', 'Landed', 'NoShow'
+
 **booking_status:** 'Confirmed', 'Cancelled', 'Pending', 'Complete'
 
 We will be managing the ticketing part of the airline database. We have seven entities as
