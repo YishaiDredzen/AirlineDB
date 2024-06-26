@@ -126,7 +126,7 @@ clean --if-exists --disable-triggers --verbose "backupSQL.sql" > backupSQL.log 2
 11. Delete bookings for a given passenger and return the count of deleted rows
 12. Calculate the total cost of bookings within a date range for a specific passenger
 
-The actual queries can be found in [Queries](Queries.sql) (1-8) and [Paramaterised Queries](ParamQueries.sql) (9-12) files.
+The actual queries can be found in [Queries](queries.sql) (1-8) and [Paramaterised Queries](ParamQueries.sql) (9-12) files.
 The detailed timings for the [Queries](QueriesTiming.log) and [Parameterised Queries](ParamQueriesTiming.log).
 
 Before indexing, the timing was as follows:
