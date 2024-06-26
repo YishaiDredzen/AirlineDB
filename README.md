@@ -33,7 +33,26 @@ Packages are generated using the ticket, flight and booking files so that the ca
 
 Codeshares are generated based on flights from the flights.csv file, a restrictions list which restrictions are randomly chosen from (including no resrictions as an option), and a randomly generated airline.
 
-  
+To copy the data into the database, use the following copy commands. **Ensure to change the directory locations to ensure the copy commands will work correctly.**
+```
+psql -d AirlineDB -c "\copy Passenger (PassengerID, Name, ContactInfo) FROM 'C:\dev\python\AirlineDB script\passengers.csv' CSV HEADER;"
+```
+```
+psql -d AirlineDB -c "\copy Seat (FlightNumber, SeatNumber) FROM 'C:\dev\python\AirlineDB script\seats.csv' CSV HEADER;"
+```
+```
+psql -d AirlineDB -c "\copy Ticket (TicketNumber, FlightNumber, SeatNumber, Price, Status, Class, PassengerID) FROM 'C:\dev\python\AirlineDB script\tickets.csv' CSV HEADER;"
+```
+```
+psql -d AirlineDB -c "\copy Booking (BookingID, PassengerID, BookingDate, Status, Cost, TicketNumber) FROM 'C:\dev\python\AirlineDB script\bookings.csv' CSV HEADER;"
+```
+```
+psql -d AirlineDB -c "\copy Package (PackageID, PackageName, Price, StartDate, CarModel, ReturnDate) FROM 'C:\dev\python\AirlineDB script\packages.csv' CSV HEADER;"
+```
+```
+psql -d AirlineDB -c "\copy CodeShare (CodeShareID, FlightNumber, MarketingAirline, Restrictions) FROM 'C:\dev\python\AirlineDB script\codeshares.csv' CSV HEADER;"
+```
+
 Below is a screenshot of the ERD:
 
 ![AltText](ERD.jpg)
