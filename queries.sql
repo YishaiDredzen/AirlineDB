@@ -1,17 +1,18 @@
+--Query 1
 SELECT f.FlightNumber, f.DepartureLocation, f.ArrivalLocation, f.DepartureTime, f.ArrivalTime, f.Capacity - COUNT(t.TicketNumber) AS AvailableSeats
 FROM Flight f
 LEFT JOIN Ticket t ON f.FlightNumber = t.FlightNumber
 WHERE f.DepartureLocation = 'New York, USA'
 GROUP BY f.FlightNumber;
 
-
+--Query 2
 SELECT FlightNumber, AVG(Price) AS AvgBusinessPrice
 FROM Ticket
 WHERE Class = 'Business'
 GROUP BY FlightNumber
 ORDER BY AvgBusinessPrice DESC;
 
-
+--Query 3
 SELECT p.Name, p.ContactInfo
 FROM Passenger p
 JOIN Booking b ON p.PassengerID = b.PassengerID
@@ -19,6 +20,7 @@ JOIN Ticket t ON b.TicketNumber = t.TicketNumber
 JOIN Flight f ON t.FlightNumber = f.FlightNumber
 WHERE f.ArrivalLocation = 'London, UK';
 
+--Query 4
 SELECT p.PassengerID, p.Name, SUM(b.Cost) AS TotalCost
 FROM Passenger p
 JOIN Booking b ON p.PassengerID = b.PassengerID
@@ -26,6 +28,7 @@ WHERE b.Status = 'Complete'
 GROUP BY p.PassengerID
 ORDER BY TotalCost DESC;
 
+--Query 5
 WITH DeletedBookings AS (
     DELETE FROM Booking
     WHERE Status = 'Cancelled'
@@ -33,19 +36,13 @@ WITH DeletedBookings AS (
 )
 SELECT COUNT(*) AS DeletedRows FROM DeletedBookings;
 
-
-DELETE FROM CodeShare WHERE FlightNumber = 1;
-DELETE FROM Seat WHERE FlightNumber = 1;
-WITH DeletedTickets AS (
-    DELETE FROM Ticket WHERE FlightNumber = 1 RETURNING TicketNumber
-)
-DELETE FROM Booking WHERE TicketNumber IN (SELECT TicketNumber FROM DeletedTickets);
-DELETE FROM Flight WHERE flightnumber = 1;
+--Query 6
+DELETE FROM Package 
+WHERE CarModel = 'Chevrolet Corvette' 
+  AND ReturnDate < CURRENT_DATE - INTERVAL '100 days';
 
 
-
-
-
+--Query 7
 UPDATE Ticket
 SET Status = 'CheckedIn'
 WHERE FlightNumber IN (
@@ -54,7 +51,7 @@ WHERE FlightNumber IN (
     WHERE DepartureTime::date = '2024-07-01'
 );
 
-
+--Query 8
 UPDATE Ticket
 SET SeatNumber = '12A'
 WHERE TicketNumber = 1

@@ -1,3 +1,4 @@
+--Query 9
 PREPARE available_flights_by_date (DATE) AS
 SELECT f.FlightNumber, f.DepartureLocation, f.ArrivalLocation, f.DepartureTime, f.ArrivalTime, f.Capacity - COUNT(t.TicketNumber) AS AvailableSeats
 FROM Flight f
@@ -9,7 +10,7 @@ HAVING f.Capacity - COUNT(t.TicketNumber) > 0;
 EXECUTE available_flights_by_date('2024-07-01');
 
 
-
+--Query 10
 PREPARE update_ticket_status (ticket_status, int) AS
 UPDATE Ticket
 SET Status = $1
@@ -23,7 +24,7 @@ AND EXISTS (
 EXECUTE update_ticket_status('Booked', 1234);
 
 
-
+--Query 11
 PREPARE delete_bookings_and_count (int) AS
 WITH DeletedBookings AS (
     DELETE FROM Booking
@@ -34,7 +35,7 @@ SELECT COUNT(*) AS DeletedRows FROM DeletedBookings;
 
 EXECUTE delete_bookings_and_count(123);
 
-
+--Query 12
 PREPARE total_cost_by_passenger_and_date_range (int, date, date) AS
 SELECT PassengerID, SUM(Cost) AS TotalCost
 FROM Booking
