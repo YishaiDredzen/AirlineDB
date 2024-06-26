@@ -161,8 +161,11 @@ WITH DeletedBookings AS (
 SELECT COUNT(*) AS DeletedRows FROM DeletedBookings;
 ```
 
-6. Delete all tickets that 100 days have passed their flights
+6. Delete all packages where the car model was 'Chevrolet Corvette' and the car was returned 100 or more days before current date.
 ```
+DELETE FROM Package 
+WHERE CarModel = 'Chevrolet Corvette' 
+  AND ReturnDate < CURRENT_DATE - INTERVAL '100 days';
 ```
 
 **Updates:**
