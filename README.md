@@ -1,5 +1,5 @@
 # Airline Database - Ticketing Service
-Fake Airline Database for Database Project 
+Fake Airline Database for Database Project. 
 
 As a class, we decided to create a database for an airline company. Each group has taken a different part of the database.
 We took the booking and tickets part where passenger's (customer's) bookings are managed in the database. 
@@ -9,16 +9,29 @@ In addition to flights, we offer package deals where customer's can rent cars th
 To Create the tables and populate them, run the files in the following order:
 
 1. First, run the **Enums.sql** script to create enums on local system
-2. The Schema definition: **Tables.sql** and **Relations.sql**
+2. The Schema definition: **Tables.sql**
 3. For generating random data, run the scripts in Data Generation folder in the following order:
-   * TicketGen.py
+   * TicketGen.py 
    * FlightGen.py
    * SeatGen.py
    * PassengerGen.py
    * BookingGen.py
    * PackageGen.py
    * CodeShareGen.py
-   * Relations.py
+
+In ticket generator, we generate passenger IDs randomly, as well as generating the seats using a random number generator and getting a letter from A-K (not I). We set the status of a seat to Standby if there are too many seats on any given flight.
+
+In the flight generator, we generate locations from a long list of cities, generate random departure date, and the arrival date is either the same date, or the next day and capacity will either be 120 for a small plane or 484 for a large plane.
+
+In the Seat generator, the seats are read from the existing tickets and the flight number from the tickets.csv.
+
+Passenger names and phone numbers are generated using Faker (a python library) and the passenger IDs are read from tickets.csv file.
+
+Bookings are generated using the ticket and flight csv files to fill the details of a booking and random generators for the other fields (status and cost)
+
+Packages are generated using the ticket, flight and booking files so that the car rental matches up with flight dates, list of a number of car models are stored in different lists and randomly chosen from based on randomly chosen package name.
+
+Codeshares are generated based on flights from the flights.csv file, a restrictions list which restrictions are randomly chosen from (including no resrictions as an option), and a randomly generated airline.
 
   
 Below is a screenshot of the ERD:
@@ -30,6 +43,13 @@ Below is a screenshot of the DSD:
 
 ![AltText](DSD.jpg)
 
+The enums in the database are:
+
+**ticket_class:** 'Economy', 'EconPlus', 'Business', 'First'
+
+**ticket_status:** 'Booked', 'Cancelled', 'CheckedIn', 'Boarded', 'InFlight', 'Landed', 'NoShow'
+
+**booking_status:** 'Confirmed', 'Cancelled', 'Pending', 'Complete'
 
 We will be managing the ticketing part of the airline database. We have seven entities as
 follows:
@@ -69,7 +89,7 @@ backupPSQL.log 2>&
 To restore, run the following command in command line and input “postgres” user password:
 ```
 pg_restore --username "postgres" --dbname "AirlineDB" --clean --if-exists --disable-
-triggers --verbose "backupPSQL.sql" > restore.log 2>&
+triggers --verbose "backupPSQL.sql" > restorePSQL.log 2>&
 ```
 **Backup Command:**
 
@@ -84,7 +104,7 @@ format=c --large-objects --verbose "AirlineDB" > backupSQL.log 2>&
 To restore, run the following command in command line and input “postgres” user password:
 ```
 pg_restore --host "localhost" --port "5432" --username "postgres" --dbname "AirlineDB" --
-clean --if-exists --disable-triggers --verbose "backupSQL.sql" > backupSQL.log 2>&
+clean --if-exists --disable-triggers --verbose "backupSQL.sql" > restoreSQL.log 2>&
 ```
 
 **Queries**
@@ -92,35 +112,151 @@ clean --if-exists --disable-triggers --verbose "backupSQL.sql" > backupSQL.log 2
 **Select Queries:**
 
 1. List all flights departing from 'New York, USA' along with the number of available seats.
+```
+SELECT f.FlightNumber, f.DepartureLocation, f.ArrivalLocation, f.DepartureTime, f.ArrivalTime, f.Capacity - COUNT(t.TicketNumber) AS AvailableSeats
+FROM Flight f
+LEFT JOIN Ticket t ON f.FlightNumber = t.FlightNumber
+WHERE f.DepartureLocation = 'New York, USA'
+GROUP BY f.FlightNumber;
+```
 2. Calculate the average price of tickets in 'Business' class for each flight
+```
+SELECT FlightNumber, AVG(Price) AS AvgBusinessPrice
+FROM Ticket
+WHERE Class = 'Business'
+GROUP BY FlightNumber
+ORDER BY AvgBusinessPrice DESC;
+```
 3. Retrieve the contact information for passengers who have booked a flight to 'London,
     UK'
+```
+SELECT p.Name, p.ContactInfo
+FROM Passenger p
+JOIN Booking b ON p.PassengerID = b.PassengerID
+JOIN Ticket t ON b.TicketNumber = t.TicketNumber
+JOIN Flight f ON t.FlightNumber = f.FlightNumber
+WHERE f.ArrivalLocation = 'London, UK';
+```
 4. Sum the total cost of bookings for each passenger who has bookings in the 'Complete'
     status
+```
+SELECT p.PassengerID, p.Name, SUM(b.Cost) AS TotalCost
+FROM Passenger p
+JOIN Booking b ON p.PassengerID = b.PassengerID
+WHERE b.Status = 'Complete'
+GROUP BY p.PassengerID
+ORDER BY TotalCost DESC;
+```
 
 
 **Deletes:**
 
 5. Delete all bookings with status 'Cancelled' and return the count of deleted rows
+```
+WITH DeletedBookings AS (
+    DELETE FROM Booking
+    WHERE Status = 'Cancelled'
+    RETURNING *
+)
+SELECT COUNT(*) AS DeletedRows FROM DeletedBookings;
+```
 
-
-6. Delete all tickets that 100 days have passed their flights
-
+6. Delete all packages where the car model was 'Chevrolet Corvette' and the car was returned 100 or more days before current date.
+```
+DELETE FROM Package 
+WHERE CarModel = 'Chevrolet Corvette' 
+  AND ReturnDate < CURRENT_DATE - INTERVAL '100 days';
+```
 
 **Updates:**
 
 7. Update the status of tickets to 'CheckedIn' for a flight departing on a specific date
+```
+UPDATE Ticket
+SET Status = 'CheckedIn'
+WHERE FlightNumber IN (
+    SELECT FlightNumber
+    FROM Flight
+    WHERE DepartureTime::date = '2024-07-01'
+);
+
+```
 8. Update the seat number for a specific ticket and ensure the seat is not already taken
+```
+UPDATE Ticket
+SET SeatNumber = '12A'
+WHERE TicketNumber = 1
+AND EXISTS (
+    SELECT 1
+    FROM Seat
+    WHERE FlightNumber = (SELECT FlightNumber FROM Ticket WHERE TicketNumber = 1)
+    AND SeatNumber = '12A'
+)
+AND NOT EXISTS (
+    SELECT 1
+    FROM Ticket
+    WHERE FlightNumber = (SELECT FlightNumber FROM Ticket WHERE TicketNumber = 1)
+    AND SeatNumber = '12A');
+```
 
 
 **Parameterized Queries:**
 
 9. Find flights departing on a specific date with available seats
+```
+PREPARE available_flights_by_date (DATE) AS
+SELECT f.FlightNumber, f.DepartureLocation, f.ArrivalLocation, f.DepartureTime, f.ArrivalTime, f.Capacity - COUNT(t.TicketNumber) AS AvailableSeats
+FROM Flight f
+LEFT JOIN Ticket t ON f.FlightNumber = t.FlightNumber
+WHERE f.DepartureTime::date = $1
+GROUP BY f.FlightNumber
+HAVING f.Capacity - COUNT(t.TicketNumber) > 0;
+```
+```
+EXECUTE available_flights_by_date('2024-07-01');
+```
 10. Update ticket status based on user input and ensure the ticket exists
+```
+PREPARE update_ticket_status (ticket_status, int) AS
+UPDATE Ticket
+SET Status = $1
+WHERE TicketNumber = $2
+AND EXISTS (
+    SELECT 1
+    FROM Ticket
+    WHERE TicketNumber = $2
+);
+```
+```
+EXECUTE update_ticket_status('Booked', 1234);
+```
 11. Delete bookings for a given passenger and return the count of deleted rows
+```
+PREPARE delete_bookings_and_count (int) AS
+WITH DeletedBookings AS (
+    DELETE FROM Booking
+    WHERE PassengerID = $1
+    RETURNING *
+)
+SELECT COUNT(*) AS DeletedRows FROM DeletedBookings;
+```
+```
+EXECUTE delete_bookings_and_count(123);
+```
 12. Calculate the total cost of bookings within a date range for a specific passenger
+```
+PREPARE total_cost_by_passenger_and_date_range (int, date, date) AS
+SELECT PassengerID, SUM(Cost) AS TotalCost
+FROM Booking
+WHERE PassengerID = $1
+AND BookingDate BETWEEN $2 AND $3
+GROUP BY PassengerID;
+```
+```
+EXECUTE total_cost_by_passenger_and_date_range(123, '2023-01-01', '2023-12-31');
+```
 
-The actual queries can be found in [Queries](Queries.sql) (1-8) and [Paramaterised Queries](ParamQueries.sql) (9-12) files.
+The actual queries can be found in [Queries](queries.sql) (1-8) and [Paramaterised Queries](ParamQueries.sql) (9-12) files.
 The detailed timings for the [Queries](QueriesTiming.log) and [Parameterised Queries](ParamQueriesTiming.log).
 
 Before indexing, the timing was as follows:
@@ -180,6 +316,20 @@ After indexing, the timing was as follows:
 | 6     | 0.074                 | 3.157               |                               |
 | 7     | 7.625                 | 5.427               | idx_ticket_flightnumber_status|
 | 8     | 0.419                 | 0.152               | idx_ticket_flightnumber_status|
+
+
+Comparing the execution times before and after indexing:
+
+| Query | Execution Time (ms) Before Indexing | Execution Time (ms) After Indexing |
+|-------|-------------------------------------|------------------------------------|
+| 1     | 31.855                              | 36.779                             |
+| 2     | 28.704                              | 22.100                             |
+| 3     | 198.084                             | 74.296                             |
+| 4     | 81.574                              | 49.451                             |
+| 5     | 14.958                              | 7.690                              |
+| 6     | 3.706                               | 3.157                              |
+| 7     | 36.417                              | 5.427                              |
+| 8     | 0.073                               | 0.152                              |
 
 
 # Constraints:
