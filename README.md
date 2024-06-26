@@ -65,7 +65,7 @@ follows:
 
 
 Properties of the entities are as follows:
-1. **Ticket** : TicketNumber, SeatID, Class, Status, Price
+1. **Ticket** : TicketNumber, SeatNumber, Class, Status, Price
 2. **Passenger** : PassengerID, Name, ContactInfo
 3. **Flight** : FlightNumber, DepartureLocation, DepartureTime, ArrivalLocation, ArrivalTime,
     Capacity
@@ -73,7 +73,7 @@ Properties of the entities are as follows:
 5. **Rental Package** : PackageID, Package Name, BookingID, StartDate, ReturnDate,
     CarModel, Price
 6. **CodeShare** : CodeShareID, FlightNumber, MarketingAirline, Restrictions
-7. **Seat** : SeatID, FlightNumber, SeatNumber
+7. **Seat** : FlightNumber, SeatNumber
 
 **Backup Command with DROP, CREATE and INSERTS:**
 
