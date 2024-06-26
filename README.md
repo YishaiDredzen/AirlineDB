@@ -186,7 +186,10 @@ After indexing, the timing was as follows:
 
 Checking Constraints:
 
-**Query** : INSERT INTO SEAT VALUES(123, '19T');
+
+```
+INSERT INTO SEAT VALUES(123, '19T');
+```
 
 **ERROR** : new row for relation "seat" violates check constraint "chk_seat_number"
 
@@ -196,10 +199,12 @@ Checking Constraints:
 regular expression. A seat is any two digit number followed by any of the letters A-K, excluding I.
 
 
+.
 
-**QUERY:** INSERT INTO Ticket (FlightNumber, SeatNumber, Price, Status, Class, PassengerID)
+```
+INSERT INTO Ticket (FlightNumber, SeatNumber, Price, Status, Class, PassengerID)
 VALUES (1, '12A', -100, 'Booked', 'Economy', 1);
-
+```
 **ERROR:** new row for relation "ticket" violates check constraint "chk_price"
 
 **DETAIL:** Failing row contains (3, 1, 12A, -100, Booked, Economy, 1).
@@ -209,8 +214,9 @@ due to inputting -100 as the price.
 
 
 
-**QUERY:** DELETE FROM Seat WHERE SeatNumber LIKE '%E';
-
+```
+DELETE FROM Seat WHERE SeatNumber LIKE '%E';
+```
 **ERROR:** update or delete on table "seat" violates foreign key constraint
 "ticket_flightnumber_seatnumber_fkey" on table "ticket"
 
@@ -221,8 +227,10 @@ Ticket table.
 
 
 
-**QUERY:** INSERT INTO booking(PassengerID, BookingDate, status, cost, ticketnumber) VALUES
+```
+INSERT INTO booking(PassengerID, BookingDate, status, cost, ticketnumber) VALUES
 (128, '12- 12 - 2024', 'Pending', -999.50, 43);
+```
 
 **ERROR:** New row for relation "booking" violates check constraint "chk_price"
 
@@ -231,6 +239,14 @@ Ticket table.
 **Explanation:** The constraint ensures that the cost field is positive, the attempted input had a
 negative cost so an error was thrown.
 
+```
+INSERT INTO Flight (DepartureLocation, ArrivalLocation, DepartureTime, ArrivalTime, Capacity) VALUES ('New York', 'Perth’ , '2024-07-01 08:00:00', '2024-07-02 05:00:00', 250);
+```
+**ERROR:**  new row for relation "flight" violates check constraint "chk_flight_duration"
+
+**DETAIL:**  Failing row contains (11, New York, Perth, 2024-07-01 08:00:00, 2024-07-02 05:00:00, 250).
+
+**Explanation:** The constraint throws an error as after doing some research, the longest flight a plane can perform is 19 hours.
 
 
 
