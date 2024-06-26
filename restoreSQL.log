@@ -1,0 +1,130 @@
+pg_restore: connecting to database for restore
+pg_restore: dropping FK CONSTRAINT ticket ticket_passengerid_fkey
+pg_restore: dropping FK CONSTRAINT ticket ticket_flightnumber_seatnumber_fkey
+pg_restore: dropping FK CONSTRAINT ticket ticket_flightnumber_fkey
+pg_restore: dropping FK CONSTRAINT seat seat_flightnumber_fkey
+pg_restore: dropping FK CONSTRAINT passengerbooking passengerbooking_passengerid_fkey
+pg_restore: dropping FK CONSTRAINT passengerbooking passengerbooking_bookingid_fkey
+pg_restore: dropping FK CONSTRAINT codeshare codeshare_flightnumber_fkey
+pg_restore: dropping FK CONSTRAINT bookingpackage bookingpackage_packageid_fkey
+pg_restore: dropping FK CONSTRAINT bookingpackage bookingpackage_bookingid_fkey
+pg_restore: dropping FK CONSTRAINT booking booking_ticketnumber_fkey
+pg_restore: dropping FK CONSTRAINT booking booking_passengerid_fkey
+pg_restore: dropping INDEX idx_totalcost
+pg_restore: dropping INDEX idx_ticket_flightnumber_status
+pg_restore: dropping INDEX idx_ticket_flightnumber
+pg_restore: dropping INDEX idx_ticket_class_flightnumber
+pg_restore: dropping INDEX idx_flight_departurelocation
+pg_restore: dropping INDEX idx_flight_arrivallocation
+pg_restore: dropping INDEX idx_booking_passengerid_status
+pg_restore: dropping INDEX idx_booking_passenger_status
+pg_restore: dropping CONSTRAINT ticket ticket_pkey
+pg_restore: dropping CONSTRAINT seat seat_pkey
+pg_restore: dropping CONSTRAINT passengerbooking passengerbooking_pkey
+pg_restore: dropping CONSTRAINT passenger passenger_pkey
+pg_restore: dropping CONSTRAINT package package_pkey
+pg_restore: dropping CONSTRAINT flight flight_pkey
+pg_restore: dropping CONSTRAINT codeshare codeshare_pkey
+pg_restore: dropping CONSTRAINT bookingpackage bookingpackage_pkey
+pg_restore: dropping CONSTRAINT booking booking_pkey
+pg_restore: dropping DEFAULT ticket ticketnumber
+pg_restore: dropping DEFAULT passenger passengerid
+pg_restore: dropping DEFAULT package packageid
+pg_restore: dropping DEFAULT flight flightnumber
+pg_restore: dropping DEFAULT codeshare codeshareid
+pg_restore: dropping DEFAULT booking bookingid
+pg_restore: dropping SEQUENCE ticket_ticketnumber_seq
+pg_restore: dropping TABLE ticket
+pg_restore: dropping TABLE seat
+pg_restore: dropping TABLE passengerbooking
+pg_restore: dropping SEQUENCE passenger_passengerid_seq
+pg_restore: dropping TABLE passenger
+pg_restore: dropping SEQUENCE package_packageid_seq
+pg_restore: dropping TABLE package
+pg_restore: dropping SEQUENCE flight_flightnumber_seq
+pg_restore: dropping TABLE flight
+pg_restore: dropping SEQUENCE codeshare_codeshareid_seq
+pg_restore: dropping TABLE codeshare
+pg_restore: dropping TABLE bookingpackage
+pg_restore: dropping SEQUENCE booking_bookingid_seq
+pg_restore: dropping TABLE booking
+pg_restore: dropping TYPE ticket_status
+pg_restore: dropping TYPE ticket_class
+pg_restore: dropping TYPE booking_status
+pg_restore: dropping SCHEMA public
+pg_restore: creating SCHEMA "public"
+pg_restore: creating COMMENT "SCHEMA public"
+pg_restore: creating TYPE "public.booking_status"
+pg_restore: creating TYPE "public.ticket_class"
+pg_restore: creating TYPE "public.ticket_status"
+pg_restore: creating TABLE "public.booking"
+pg_restore: creating SEQUENCE "public.booking_bookingid_seq"
+pg_restore: creating SEQUENCE OWNED BY "public.booking_bookingid_seq"
+pg_restore: creating TABLE "public.bookingpackage"
+pg_restore: creating TABLE "public.codeshare"
+pg_restore: creating SEQUENCE "public.codeshare_codeshareid_seq"
+pg_restore: creating SEQUENCE OWNED BY "public.codeshare_codeshareid_seq"
+pg_restore: creating TABLE "public.flight"
+pg_restore: creating SEQUENCE "public.flight_flightnumber_seq"
+pg_restore: creating SEQUENCE OWNED BY "public.flight_flightnumber_seq"
+pg_restore: creating TABLE "public.package"
+pg_restore: creating SEQUENCE "public.package_packageid_seq"
+pg_restore: creating SEQUENCE OWNED BY "public.package_packageid_seq"
+pg_restore: creating TABLE "public.passenger"
+pg_restore: creating SEQUENCE "public.passenger_passengerid_seq"
+pg_restore: creating SEQUENCE OWNED BY "public.passenger_passengerid_seq"
+pg_restore: creating TABLE "public.passengerbooking"
+pg_restore: creating TABLE "public.seat"
+pg_restore: creating TABLE "public.ticket"
+pg_restore: creating SEQUENCE "public.ticket_ticketnumber_seq"
+pg_restore: creating SEQUENCE OWNED BY "public.ticket_ticketnumber_seq"
+pg_restore: creating DEFAULT "public.booking bookingid"
+pg_restore: creating DEFAULT "public.codeshare codeshareid"
+pg_restore: creating DEFAULT "public.flight flightnumber"
+pg_restore: creating DEFAULT "public.package packageid"
+pg_restore: creating DEFAULT "public.passenger passengerid"
+pg_restore: creating DEFAULT "public.ticket ticketnumber"
+pg_restore: processing data for table "public.booking"
+pg_restore: processing data for table "public.bookingpackage"
+pg_restore: processing data for table "public.codeshare"
+pg_restore: processing data for table "public.flight"
+pg_restore: processing data for table "public.package"
+pg_restore: processing data for table "public.passenger"
+pg_restore: processing data for table "public.passengerbooking"
+pg_restore: processing data for table "public.seat"
+pg_restore: processing data for table "public.ticket"
+pg_restore: executing SEQUENCE SET booking_bookingid_seq
+pg_restore: executing SEQUENCE SET codeshare_codeshareid_seq
+pg_restore: executing SEQUENCE SET flight_flightnumber_seq
+pg_restore: executing SEQUENCE SET package_packageid_seq
+pg_restore: executing SEQUENCE SET passenger_passengerid_seq
+pg_restore: executing SEQUENCE SET ticket_ticketnumber_seq
+pg_restore: creating CONSTRAINT "public.booking booking_pkey"
+pg_restore: creating CONSTRAINT "public.bookingpackage bookingpackage_pkey"
+pg_restore: creating CONSTRAINT "public.codeshare codeshare_pkey"
+pg_restore: creating CONSTRAINT "public.flight flight_pkey"
+pg_restore: creating CONSTRAINT "public.package package_pkey"
+pg_restore: creating CONSTRAINT "public.passenger passenger_pkey"
+pg_restore: creating CONSTRAINT "public.passengerbooking passengerbooking_pkey"
+pg_restore: creating CONSTRAINT "public.seat seat_pkey"
+pg_restore: creating CONSTRAINT "public.ticket ticket_pkey"
+pg_restore: creating INDEX "public.idx_booking_passenger_status"
+pg_restore: creating INDEX "public.idx_booking_passengerid_status"
+pg_restore: creating INDEX "public.idx_flight_arrivallocation"
+pg_restore: creating INDEX "public.idx_flight_departurelocation"
+pg_restore: creating INDEX "public.idx_ticket_class_flightnumber"
+pg_restore: creating INDEX "public.idx_ticket_flightnumber"
+pg_restore: creating INDEX "public.idx_ticket_flightnumber_status"
+pg_restore: creating INDEX "public.idx_totalcost"
+pg_restore: creating FK CONSTRAINT "public.booking booking_passengerid_fkey"
+pg_restore: creating FK CONSTRAINT "public.booking booking_ticketnumber_fkey"
+pg_restore: creating FK CONSTRAINT "public.bookingpackage bookingpackage_bookingid_fkey"
+pg_restore: creating FK CONSTRAINT "public.bookingpackage bookingpackage_packageid_fkey"
+pg_restore: creating FK CONSTRAINT "public.codeshare codeshare_flightnumber_fkey"
+pg_restore: creating FK CONSTRAINT "public.passengerbooking passengerbooking_bookingid_fkey"
+pg_restore: creating FK CONSTRAINT "public.passengerbooking passengerbooking_passengerid_fkey"
+pg_restore: creating FK CONSTRAINT "public.seat seat_flightnumber_fkey"
+pg_restore: creating FK CONSTRAINT "public.ticket ticket_flightnumber_fkey"
+pg_restore: creating FK CONSTRAINT "public.ticket ticket_flightnumber_seatnumber_fkey"
+pg_restore: creating FK CONSTRAINT "public.ticket ticket_passengerid_fkey"
+pg_restore: creating ACL "SCHEMA public"
