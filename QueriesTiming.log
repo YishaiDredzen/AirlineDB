@@ -104,6 +104,14 @@ HashAggregate  (cost=4239.03..4239.67 rows=51 width=60) (actual time=36.587..36.
 ------------------------------------------------------------------------------------------------------------------------------------------
 -- Query 6
 
+Delete on package  (cost=0.00..22.50 rows=0 width=0) (actual time=0.379..0.379 rows=0 loops=1)
+   ->  Seq Scan on package  (cost=0.00..22.50 rows=41 width=6) (actual time=0.016..0.155 rows=41 loops=1)
+         Filter: ((carmodel)::text = 'Chevrolet Corvette'::text)
+         Rows Removed by Filter: 959
+ Planning Time: 0.074 ms
+ Trigger for constraint bookingpackage_packageid_fkey: time=2.755 calls=41
+ Execution Time: 3.157 ms
+(7 rows)
 ------------------------------------------------------------------------------------------------------------------------------------------
 
 -- Query 7
