@@ -11,13 +11,27 @@ To Create the tables and populate them, run the files in the following order:
 1. First, run the **Enums.sql** script to create enums on local system
 2. The Schema definition: **Tables.sql**
 3. For generating random data, run the scripts in Data Generation folder in the following order:
-   * TicketGen.py
+   * TicketGen.py 
    * FlightGen.py
    * SeatGen.py
    * PassengerGen.py
    * BookingGen.py
    * PackageGen.py
    * CodeShareGen.py
+
+In ticket generator, we generate passenger IDs randomly, as well as generating the seats using a random number generator and getting a letter from A-K (not I). We set the status of a seat to Standby if there are too many seats on any given flight.
+
+In the flight generator, we generate locations from a long list of cities, generate random departure date, and the arrival date is either the same date, or the next day and capacity will either be 120 for a small plane or 484 for a large plane.
+
+In the Seat generator, the seats are read from the existing tickets and the flight number from the tickets.csv.
+
+Passenger names and phone numbers are generated using Faker (a python library) and the passenger IDs are read from tickets.csv file.
+
+Bookings are generated using the ticket and flight csv files to fill the details of a booking and random generators for the other fields (status and cost)
+
+Packages are generated using the ticket, flight and booking files so that the car rental matches up with flight dates, list of a number of car models are stored in different lists and randomly chosen from based on randomly chosen package name.
+
+Codeshares are generated based on flights from the flights.csv file, a restrictions list which restrictions are randomly chosen from (including no resrictions as an option), and a randomly generated airline.
 
   
 Below is a screenshot of the ERD:
