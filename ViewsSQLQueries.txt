@@ -1,0 +1,57 @@
+-- Select statement for PassengerDetailsView
+SELECT *
+FROM PassengerDetailsView;
+
+-- Select statement for BookingDetailsView
+SELECT *
+FROM BookingDetailsView;
+
+-- Select statement for FlightDetailsView
+SELECT *
+FROM FlightDetailsView;
+
+-- Select statement for PackageDetailsView
+SELECT *
+FROM PackageDetailsView;
+
+
+-- Inserting a new passenger:
+INSERT INTO Passenger (PassengerID, Name, ContactInfo)
+VALUES (948576043, 'John Doe', '0582574612');
+
+-- Verify in PassengerDetailsView
+SELECT * FROM PassengerDetailsView;
+
+-- Insert a new booking
+INSERT INTO Booking (BookingID, PassengerID, BookingDate, TicketNumber)
+VALUES (200001, 948576043, '2024-07-10', 2151);
+
+-- Verify in BookingDetailsView
+SELECT * FROM BookingDetailsView;
+
+
+-- Update a passenger's contact information
+UPDATE Passenger
+SET ContactInfo = '0584895558'
+WHERE PassengerID = 948576043;
+
+-- Verify in PassengerDetailsView
+SELECT * FROM PassengerDetailsView;
+
+-- Delete a package
+DELETE FROM Package
+WHERE PackageID = 1;
+
+-- Verify in PackageDetailsView
+SELECT * FROM PackageDetailsView;
+
+
+-- Update a flight's arrival location
+UPDATE Flight
+SET ArrivalLocation = 'New York, USA'
+WHERE FlightNumber = 53;
+
+-- Verify in FlightDetailsView
+SELECT * FROM FlightDetailsView;
+
+

@@ -1,0 +1,69 @@
+-- Query 1: List of all passengers along with their flight details
+SELECT P.PassengerID, P.Name, F.FlightNumber, F.DepartureLocation, F.ArrivalLocation
+FROM Booking B
+JOIN Passenger P ON B.PassengerID = P.PassengerID
+JOIN Ticket T ON B.TicketNumber = T.TicketNumber
+JOIN Flight F ON T.FlightNumber = F.FlightNumber;
+
+
+ Hash Join  (cost=4902.56..11843.47 rows=149759 width=54) (actual time=29.078..149.437 rows=149759 loops=1)
+   Hash Cond: (t.flightnumber = f.flightnumber)
+   ->  Hash Join  (cost=4829.58..11376.54 rows=149759 width=22) (actual time=28.660..126.423 rows=149759 loops=1)
+         Hash Cond: (b.passengerid = p.passengerid)
+         ->  Hash Join  (cost=4521.58..10675.25 rows=149759 width=8) (actual time=27.073..101.736 rows=149759 loops=1)
+               Hash Cond: (t.ticketnumber = b.ticketnumber)
+               ->  Seq Scan on ticket t  (cost=0.00..3661.39 rows=198939 width=8) (actual time=0.008..12.603 rows=198939 loops=1)
+               ->  Hash  (cost=2649.59..2649.59 rows=149759 width=8) (actual time=26.742..26.747 rows=149759 loops=1)
+                     Buckets: 262144  Batches: 1  Memory Usage: 7898kB
+                     ->  Seq Scan on booking b  (cost=0.00..2649.59 rows=149759 width=8) (actual time=0.010..12.063 rows=149759 loops=1)
+         ->  Hash  (cost=183.00..183.00 rows=10000 width=18) (actual time=1.550..1.551 rows=10000 loops=1)
+               Buckets: 16384  Batches: 1  Memory Usage: 620kB
+               ->  Seq Scan on passenger p  (cost=0.00..183.00 rows=10000 width=18) (actual time=0.006..0.728 rows=10000 loops=1)
+   ->  Hash  (cost=47.99..47.99 rows=1999 width=36) (actual time=0.410..0.410 rows=1999 loops=1)
+         Buckets: 2048  Batches: 1  Memory Usage: 151kB
+         ->  Seq Scan on flight f  (cost=0.00..47.99 rows=1999 width=36) (actual time=0.013..0.203 rows=1999 loops=1)
+ Planning Time: 6.723 ms
+ Execution Time: 153.781 ms
+(18 rows)
+
+------------------------------------------------------------------------------------------------------------------------------------------
+
+-- Query 2: List of all bookings with flight details (excluding package details due to schema constraints)
+SELECT B.BookingID, B.BookingDate, F.FlightNumber, F.DepartureLocation, F.ArrivalLocation
+FROM Booking B
+JOIN Ticket T ON B.TicketNumber = T.TicketNumber
+JOIN Flight F ON T.FlightNumber = F.FlightNumber;
+
+ Hash Join  (cost=6999.11..12677.78 rows=149759 width=44) (actual time=35.843..160.626 rows=149759 loops=1)
+   Hash Cond: (t.flightnumber = f.flightnumber)
+   ->  Hash Join  (cost=6926.13..12210.85 rows=149759 width=12) (actual time=35.227..127.930 rows=149759 loops=1)
+         Hash Cond: (b.ticketnumber = t.ticketnumber)
+         ->  Seq Scan on booking b  (cost=0.00..2649.59 rows=149759 width=12) (actual time=0.008..14.157 rows=149759 loops=1)
+         ->  Hash  (cost=3661.39..3661.39 rows=198939 width=8) (actual time=34.426..34.428 rows=198939 loops=1)
+               Buckets: 262144  Batches: 2  Memory Usage: 5946kB
+               ->  Seq Scan on ticket t  (cost=0.00..3661.39 rows=198939 width=8) (actual time=0.013..12.639 rows=198939 loops=1)
+   ->  Hash  (cost=47.99..47.99 rows=1999 width=36) (actual time=0.609..0.609 rows=1999 loops=1)
+         Buckets: 2048  Batches: 1  Memory Usage: 151kB
+         ->  Seq Scan on flight f  (cost=0.00..47.99 rows=1999 width=36) (actual time=0.013..0.286 rows=1999 loops=1)
+ Planning Time: 0.494 ms
+ Execution Time: 165.331 ms
+(13 rows)
+
+------------------------------------------------------------------------------------------------------------------------------------------
+
+--Query 3: List all seats that are booked on each flight
+SELECT S.FlightNumber, S.SeatNumber
+FROM Seat S
+JOIN Ticket T ON S.FlightNumber = T.FlightNumber AND S.SeatNumber = T.SeatNumber
+WHERE T.Status = 'Booked';
+
+ Hash Join  (cost=6149.83..11402.17 rows=28687 width=8) (actual time=33.785..97.127 rows=28196 loops=1)
+   Hash Cond: ((t.flightnumber = s.flightnumber) AND ((t.seatnumber)::text = (s.seatnumber)::text))
+   ->  Seq Scan on ticket t  (cost=0.00..4158.74 rows=28687 width=8) (actual time=0.012..21.951 rows=28196 loops=1)
+         Filter: (status = 'Booked'::ticket_status)
+         Rows Removed by Filter: 170743
+   ->  Hash  (cost=2681.93..2681.93 rows=183393 width=8) (actual time=33.299..33.300 rows=183393 loops=1)
+         Buckets: 262144  Batches: 2  Memory Usage: 5622kB
+         ->  Seq Scan on seat s  (cost=0.00..2681.93 rows=183393 width=8) (actual time=0.013..8.230 rows=183393 loops=1) Planning Time: 2.951 ms
+ Execution Time: 98.806 ms
+(10 rows)

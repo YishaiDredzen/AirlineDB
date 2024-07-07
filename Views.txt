@@ -1,0 +1,58 @@
+Sure, here's a brief summary of the views created based on your database schema:
+
+1. **PassengerDetailsView**:
+   - **Purpose**: Provides details about passengers.
+   - **Fields**: PassengerID, FullName (concatenated FirstName and LastName), Contact (ContactInfo).
+
+CREATE VIEW PassengerDetailsView AS
+SELECT 
+    PassengerID,
+    Name AS FullName,
+    ContactInfo AS Contact
+FROM Passenger;
+
+2. **FlightDetailsView**:
+   - **Purpose**: Shows comprehensive details about flights.
+   - **Fields**: FlightNumber, DepartureLocation, ArrivalLocation, DepartureTime, ArrivalTime, Capacity.
+
+CREATE VIEW FlightDetailsView AS
+SELECT 
+    FlightNumber,
+    DepartureLocation,
+    ArrivalLocation,
+    DepartureTime,
+    ArrivalTime,
+    Capacity
+FROM Flight;
+
+
+
+3. **PackageDetailsView**:
+   - **Purpose**: Displays details about packages.
+   - **Fields**: PackageID, PackageName, Price, StartDate, ReturnDate.
+
+CREATE VIEW PackageDetailsView AS
+SELECT 
+    PackageID,
+    PackageName,
+    Price,
+    StartDate,
+    ReturnDate
+FROM Package;
+
+4. **BookingDetailsView**:
+   - **Purpose**: Displays booking details along with passenger and flight information.
+   - **Fields**: BookingID, BookingDate, PassengerName (Passenger's full name), FlightNumber, DepartureLocation, ArrivalLocation.
+
+CREATE VIEW BookingDetailsView AS
+SELECT
+    B.BookingID,
+    B.BookingDate,
+    P.Name AS PassengerName,
+    T.FlightNumber,
+    F.DepartureLocation,
+    F.ArrivalLocation
+FROM Booking B
+JOIN Passenger P ON B.PassengerID = P.PassengerID
+JOIN Ticket T ON B.TicketNumber = T.TicketNumber
+JOIN Flight F ON T.FlightNumber = F.FlightNumber;
