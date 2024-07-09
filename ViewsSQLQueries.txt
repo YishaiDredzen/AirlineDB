@@ -1,57 +1,51 @@
--- Select statement for PassengerDetailsView
-SELECT *
-FROM PassengerDetailsView;
+SELECT * FROM PassengerView WHERE PassengerID = 948576043 OR PassengerID = 949766213;
 
--- Select statement for BookingDetailsView
-SELECT *
-FROM BookingDetailsView;
+SELECT * FROM BookingView WHERE BookingID > 190050 AND BookingID <= 200001;
 
--- Select statement for FlightDetailsView
-SELECT *
-FROM FlightDetailsView;
+SELECT * FROM FlightView WHERE FlightNumber = 953;
 
--- Select statement for PackageDetailsView
-SELECT *
-FROM PackageDetailsView;
+SELECT * FROM PackageView WHERE PackageID = 105;
 
 
--- Inserting a new passenger:
-INSERT INTO Passenger (PassengerID, Name, ContactInfo)
-VALUES (948576043, 'John Doe', '0582574612');
 
--- Verify in PassengerDetailsView
-SELECT * FROM PassengerDetailsView;
+INSERT INTO Passenger (PassengerID, Name, ContactInfo) VALUES (949766213, 'Jane Doe', '0584468238');
 
--- Insert a new booking
-INSERT INTO Booking (BookingID, PassengerID, BookingDate, TicketNumber)
-VALUES (200001, 948576043, '2024-07-10', 2151);
+UPDATE Passenger SET ContactInfo = '0521234588' WHERE PassengerID = 949766213;
 
--- Verify in BookingDetailsView
-SELECT * FROM BookingDetailsView;
+DELETE FROM Passenger WHERE PassengerID = 949766213;
 
 
--- Update a passenger's contact information
-UPDATE Passenger
-SET ContactInfo = '0584895558'
-WHERE PassengerID = 948576043;
-
--- Verify in PassengerDetailsView
-SELECT * FROM PassengerDetailsView;
-
--- Delete a package
-DELETE FROM Package
-WHERE PackageID = 1;
-
--- Verify in PackageDetailsView
-SELECT * FROM PackageDetailsView;
 
 
--- Update a flight's arrival location
-UPDATE Flight
-SET ArrivalLocation = 'New York, USA'
-WHERE FlightNumber = 53;
+INSERT INTO Booking (BookingID, PassengerID, BookingDate, Status, Cost, TicketNumber) 
+VALUES (200002, 948576043, '2023-07-09', 'Completed', 500.00, 2152);
 
--- Verify in FlightDetailsView
-SELECT * FROM FlightDetailsView;
+UPDATE Booking SET Status = 'Cancelled' WHERE BookingID = 200001;
+
+DELETE FROM Booking WHERE BookingID = 200000;
+
+
+
+INSERT INTO Flight (DepartureLocation, ArrivalLocation, DepartureTime, ArrivalTime, Capacity) 
+VALUES ('New York, USA', 'Los Angeles, USA', '2024-07-09 08:00:00', '2024-07-09 12:00:00', 120);
+
+UPDATE Flight SET Capacity = 484 WHERE FlightNumber = 1004;
+
+DELETE FROM Flight WHERE FlightNumber = 1004;
+
+
+
+
+INSERT INTO Package (PackageName, Price, StartDate, CarModel, ReturnDate) 
+VALUES ('Premium', 2958.34, '2023-07-15', 'Savana 1500', '2024-07-20');
+
+UPDATE Package SET Price = 1650.00 WHERE CarModel = 'Savana 1500';
+
+DELETE FROM Package WHERE PackageID = 2586;
+
+
+
+
+
 
 

@@ -1,58 +1,96 @@
-Sure, here's a brief summary of the views created based on your database schema:
+1. Passenger View
+This view will include passenger details along with their booking information. This will be used by airport security as well as airport desk staff to ensure the passenger is who they say they are as well as to ensure the passenger gets the correct seat on the flight. It could also be used by the marketing team to send personalized advertisements based on previous bookings made by the passenger and promotions to "premium" customers (those that have booked business or first class tickets before).
 
-1. **PassengerDetailsView**:
-   - **Purpose**: Provides details about passengers.
-   - **Fields**: PassengerID, FullName (concatenated FirstName and LastName), Contact (ContactInfo).
-
-CREATE VIEW PassengerDetailsView AS
+CREATE VIEW PassengerView AS
 SELECT 
-    PassengerID,
-    Name AS FullName,
-    ContactInfo AS Contact
-FROM Passenger;
+    p.PassengerID, 
+    p.Name, 
+    p.ContactInfo, 
+    b.BookingID, 
+    b.BookingDate, 
+    b.Status AS BookingStatus, 
+    b.Cost,
+    t.TicketNumber,
+    t.FlightNumber,
+    t.SeatNumber,
+    t.Price AS TicketPrice,
+    t.Status AS TicketStatus,
+    t.Class AS TicketClass
+FROM 
+    Passenger p
+LEFT JOIN 
+    Booking b ON p.PassengerID = b.PassengerID
+LEFT JOIN 
+    Ticket t ON b.TicketNumber = t.TicketNumber;
 
-2. **FlightDetailsView**:
-   - **Purpose**: Shows comprehensive details about flights.
-   - **Fields**: FlightNumber, DepartureLocation, ArrivalLocation, DepartureTime, ArrivalTime, Capacity.
 
-CREATE VIEW FlightDetailsView AS
+2. Booking View
+This view will include booking details along with flight and passenger information. This will be used by the airport desk crew when checking in passengers to help see which seats are available on the passenger's flight and will be able to see if seats are available in the event the passenger did not book beforehand.
+
+CREATE VIEW BookingView AS
 SELECT 
-    FlightNumber,
-    DepartureLocation,
-    ArrivalLocation,
-    DepartureTime,
-    ArrivalTime,
-    Capacity
-FROM Flight;
+    b.BookingID, 
+    b.PassengerID, 
+    p.Name AS PassengerName, 
+    p.ContactInfo, 
+    b.BookingDate, 
+    b.Status AS BookingStatus, 
+    b.Cost, 
+    t.TicketNumber, 
+    t.FlightNumber, 
+    f.DepartureLocation, 
+    f.ArrivalLocation, 
+    f.DepartureTime, 
+    f.ArrivalTime, 
+    t.SeatNumber, 
+    t.Price AS TicketPrice, 
+    t.Status AS TicketStatus, 
+    t.Class AS TicketClass
+FROM 
+    Booking b
+LEFT JOIN 
+    Passenger p ON b.PassengerID = p.PassengerID
+LEFT JOIN 
+    Ticket t ON b.TicketNumber = t.TicketNumber
+LEFT JOIN 
+    Flight f ON t.FlightNumber = f.FlightNumber;
 
 
+3. Flight View
+This view will include flight details along with ticket and seat information. This will be used by the flight admin crew that ensures there are not too many flights at any given time, as well as by the financial team to ensure flights are relatively fully booked to ensure that the airline's money is not being wasted on empty flights.
 
-3. **PackageDetailsView**:
-   - **Purpose**: Displays details about packages.
-   - **Fields**: PackageID, PackageName, Price, StartDate, ReturnDate.
-
-CREATE VIEW PackageDetailsView AS
+CREATE VIEW FlightView AS
 SELECT 
-    PackageID,
-    PackageName,
-    Price,
-    StartDate,
+    f.FlightNumber, 
+    f.DepartureLocation, 
+    f.ArrivalLocation, 
+    f.DepartureTime, 
+    f.ArrivalTime, 
+    f.Capacity, 
+    t.TicketNumber, 
+    t.SeatNumber, 
+    t.Price AS TicketPrice, 
+    t.Status AS TicketStatus, 
+    t.Class AS TicketClass, 
+    s.SeatNumber AS AvailableSeat
+FROM 
+    Flight f
+LEFT JOIN 
+    Ticket t ON f.FlightNumber = t.FlightNumber
+LEFT JOIN 
+    Seat s ON f.FlightNumber = s.FlightNumber;
+
+
+4. Package View
+This view will include package details. This will be used by the car rental admin staff to manage which cars have been rented out, are available to be rented and need to be returned/are now being returned.
+
+CREATE VIEW PackageView AS
+SELECT 
+    PackageID, 
+    PackageName, 
+    Price, 
+    StartDate, 
+    CarModel, 
     ReturnDate
-FROM Package;
-
-4. **BookingDetailsView**:
-   - **Purpose**: Displays booking details along with passenger and flight information.
-   - **Fields**: BookingID, BookingDate, PassengerName (Passenger's full name), FlightNumber, DepartureLocation, ArrivalLocation.
-
-CREATE VIEW BookingDetailsView AS
-SELECT
-    B.BookingID,
-    B.BookingDate,
-    P.Name AS PassengerName,
-    T.FlightNumber,
-    F.DepartureLocation,
-    F.ArrivalLocation
-FROM Booking B
-JOIN Passenger P ON B.PassengerID = P.PassengerID
-JOIN Ticket T ON B.TicketNumber = T.TicketNumber
-JOIN Flight F ON T.FlightNumber = F.FlightNumber;
+FROM 
+    Package;

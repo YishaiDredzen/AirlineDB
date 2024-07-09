@@ -1,0 +1,11 @@
+-- Query for visual 1: Number of bookings per flight
+SELECT F.FlightNumber, COUNT(B.BookingID) AS NumberOfBookings
+FROM Flight F
+JOIN Ticket T ON F.FlightNumber = T.FlightNumber
+JOIN Booking B ON T.TicketNumber = B.TicketNumber
+GROUP BY F.FlightNumber;
+
+-- Query for visual 2: Total revenue from packages
+SELECT PK.PackageID, SUM(PK.Price * 1) AS TotalRevenue
+FROM Package PK
+GROUP BY PK.PackageID;

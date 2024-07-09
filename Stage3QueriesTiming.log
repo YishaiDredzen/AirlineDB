@@ -64,6 +64,7 @@ WHERE T.Status = 'Booked';
          Rows Removed by Filter: 170743
    ->  Hash  (cost=2681.93..2681.93 rows=183393 width=8) (actual time=33.299..33.300 rows=183393 loops=1)
          Buckets: 262144  Batches: 2  Memory Usage: 5622kB
-         ->  Seq Scan on seat s  (cost=0.00..2681.93 rows=183393 width=8) (actual time=0.013..8.230 rows=183393 loops=1) Planning Time: 2.951 ms
+         ->  Seq Scan on seat s  (cost=0.00..2681.93 rows=183393 width=8) (actual time=0.013..8.230 rows=183393 loops=1) 
+Planning Time: 2.951 ms
  Execution Time: 98.806 ms
 (10 rows)
