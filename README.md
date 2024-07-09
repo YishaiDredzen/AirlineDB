@@ -417,7 +417,335 @@ INSERT INTO Flight (DepartureLocation, ArrivalLocation, DepartureTime, ArrivalTi
 
 **Explanation:** The constraint throws an error as after doing some research, the longest flight a plane can perform is 19 hours.
 
+**Stage 3 Queries:**
+
+**Query 1:** List of all passengers along with their flight details
+```
+SELECT P.PassengerID, P.Name, F.FlightNumber, F.DepartureLocation, F.ArrivalLocation
+FROM Booking B
+JOIN Passenger P ON B.PassengerID = P.PassengerID
+JOIN Ticket T ON B.TicketNumber = T.TicketNumber
+JOIN Flight F ON T.FlightNumber = F.FlightNumber;
+```
+
+***Query 2:*** List of all bookings with flight details (excluding package details due to schema
+constraints)
+The reason package details couldn’t be displayed is due to the way bookings and packages are
+related in the database schema.
+```
+SELECT B.BookingID, B.BookingDate, F.FlightNumber, F.DepartureLocation, F.ArrivalLocation
+FROM Booking B
+JOIN Ticket T ON B.TicketNumber = T.TicketNumber
+JOIN Flight F ON T.FlightNumber = F.FlightNumber;
+```
+***Query 3:*** List all seats that are booked on each flight.
+```
+SELECT S.FlightNumber, S.SeatNumber
+FROM Seat S
+JOIN Ticket T ON S.FlightNumber = T.FlightNumber AND S.SeatNumber = T.SeatNumber
+WHERE T.Status = 'Booked';
+```
+
+Query timing for the stage 3 queries:
+
+| Query | Execution Time (ms) |
+|-------|---------------------|
+| 1     | 153.781             |
+| 2     | 165.331             |
+| 3     | 98.806              |
+
+****Views****
+
+Views provide a way to present data in a structured manner without storing the data physically.
+They are defined by SQL queries and can simplify complex data retrieval.
+
+We created the following views:
+
+1. Passenger View
+This view will include passenger details along with their booking information. This will be used
+by airport security as well as airport desk staff to ensure the passenger is who they say they are
+as well as to ensure the passenger gets the correct seat on the flight. It could also be used by
+the marketing team to send personalized advertisements based on previous bookings made by
+the passenger and promotions to "premium" customers (those that have booked business or
+first class tickets before).
+
+```
+CREATE VIEW PassengerView AS
+
+SELECT
+
+p.PassengerID,
+
+p.Name,
+
+p.ContactInfo,
+
+b.BookingID,
+
+b.BookingDate,
+
+b.Status AS BookingStatus,
+
+b.Cost,
+
+t.TicketNumber,
+
+t.FlightNumber,
+
+t.SeatNumber,
+
+t.Price AS TicketPrice,
+
+t.Status AS TicketStatus,
+
+t.Class AS TicketClass
+
+FROM
+
+Passenger p
+
+LEFT JOIN
+
+Booking b ON p.PassengerID = b.PassengerID
+
+LEFT JOIN
+
+Ticket t ON b.TicketNumber = t.TicketNumber;
+```
+
+Here are a select, insert, delete and update query for the passenger view:
+SELECT Query:
+```
+SELECT * FROM PassengerView WHERE PassengerID = 948576043 OR PassengerID = 949766213;
+```
+INSERT Query:
+```
+INSERT INTO Passenger (PassengerID, Name, ContactInfo) VALUES (949766213, 'Jane Doe', '0584468238');
+```
+UPDATE Query:
+```
+UPDATE Passenger SET ContactInfo = '0521234588' WHERE PassengerID = 949766213;
+```
+DELETE Query:
+```
+DELETE FROM Passenger WHERE PassengerID = 949766213;
+```
+
+2. Booking View
+This view will include booking details along with flight and passenger information. This will be
+used by the airport desk crew when checking in passengers to help see which seats are
+available on the passenger's flight and will be able to see if seats are available in the event the
+passenger did not book beforehand.
+
+```
+CREATE VIEW BookingView AS
+
+SELECT
+
+b.BookingID,
+
+b.PassengerID,
+
+p.Name AS PassengerName,
+
+p.ContactInfo,
+
+b.BookingDate,
+
+b.Status AS BookingStatus,
+
+b.Cost,
+
+t.TicketNumber,
+
+t.FlightNumber,
+
+f.DepartureLocation,
+
+f.ArrivalLocation,
+
+f.DepartureTime,
+
+f.ArrivalTime,
+
+t.SeatNumber,
+
+t.Price AS TicketPrice,
+
+t.Status AS TicketStatus,
+
+t.Class AS TicketClass
+
+FROM
+
+Booking b
+
+LEFT JOIN
+
+Passenger p ON b.PassengerID = p.PassengerID
+
+LEFT JOIN
+
+Ticket t ON b.TicketNumber = t.TicketNumber
+
+LEFT JOIN
+
+Flight f ON t.FlightNumber = f.FlightNumber;
+```
+
+Here are a select, insert, delete and update query for the booking view:
+SELECT Query:
+```
+SELECT * FROM BookingView WHERE BookingID > 190050 AND BookingID <= 200001;
+```
+INSERT Query:
+```
+INSERT INTO Booking (BookingID, PassengerID, BookingDate, Status, Cost, TicketNumber) VALUES (200002, 948576043, '2023-07-09', 'Completed', 500.00, 2152);
+```
+UPDATE Query:
+```
+UPDATE Booking SET Status = 'Cancelled' WHERE BookingID = 200001;
+```
+DELETE Query:
+```
+DELETE FROM Booking WHERE BookingID = 200000;
+```
+
+3. Flight View
+This view will include flight details along with ticket and seat information. This will be used by
+the flight admin crew that ensures there are not too many flights at any given time, as well as by
+the financial team to ensure flights are relatively fully booked to ensure that the airline's money
+is not being wasted on empty flights.
+
+```
+CREATE VIEW FlightView AS
+
+SELECT
+
+f.FlightNumber,
+
+f.DepartureLocation,
+
+f.ArrivalLocation,
+
+f.DepartureTime,
+
+f.ArrivalTime,
+
+f.Capacity,
+
+t.TicketNumber,
+
+t.SeatNumber,
+
+t.Price AS TicketPrice,
+
+t.Status AS TicketStatus,
+
+t.Class AS TicketClass,
+
+s.SeatNumber AS AvailableSeat
+
+FROM
+
+Flight f
+
+LEFT JOIN
+
+Ticket t ON f.FlightNumber = t.FlightNumber
+
+LEFT JOIN
+
+Seat s ON f.FlightNumber = s.FlightNumber;
+```
+
+Here are a select, insert, delete and update query for the flight view:
+SELECT Query:
+```
+SELECT * FROM FlightView WHERE FlightNumber = 953;
+```
+INSERT Query:
+```
+INSERT INTO Flight (DepartureLocation, ArrivalLocation, DepartureTime, ArrivalTime, Capacity) VALUES ('New York, USA', 'Los Angeles, USA', '2024-07-09 08:00:00', '2024-07-09 12:00:00', 120);
+```
+UPDATE Query:
+```
+UPDATE Flight SET Capacity = 484 WHERE FlightNumber = 1004;
+```
+DELETE Query:
+```
+DELETE FROM Flight WHERE FlightNumber = 1004;
+```
+
+4. Package View
+This view will include package details. This will be used by the car rental admin staff to manage
+which cars have been rented out, are available to be rented and need to be returned/are now
+being returned.
+```
+CREATE VIEW PackageView AS
+
+SELECT
+
+PackageID,
+
+PackageName,
+
+Price,
+
+StartDate,
+
+CarModel,
+
+ReturnDate
+
+FROM
+
+Package;
+```
+
+Here are a select, insert, delete and update query for the package view:
+SELECT Query:
+```
+SELECT * FROM PackageView WHERE PackageID = 105;
+```
+INSERT Query:
+```
+INSERT INTO Package (PackageName, Price, StartDate, CarModel, ReturnDate) VALUES ('Premium', 2958.34, '2023-07-15', 'Savana 1500', '2024-07-20');
+```
+UPDATE Query:
+```
+UPDATE Package SET Price = 1650.00 WHERE CarModel = 'Savana 1500';
+```
+DELETE Query:
+```
+DELETE FROM Package WHERE PackageID = 2586;
+```
 
 
+****Visualizations****
 
+***Number of bookings per flight***
+
+```
+SELECT F.FlightNumber, COUNT(B.BookingID) AS NumberOfBookings
+FROM Flight F
+JOIN Ticket T ON F.FlightNumber = T.FlightNumber
+JOIN Booking B ON T.TicketNumber = B.TicketNumber
+GROUP BY F.FlightNumber;
+```
+
+Line graph showing the number of bookings per flight:
+![AltText](BookingsPerFlightLineChart.jpg)
+
+***Total revenue made from packages***
+```
+SELECT PK.PackageID, SUM(PK.Price * 1) AS TotalRevenue
+FROM Package PK
+GROUP BY PK.PackageID;
+```
+
+Bar chart showing the total revenue made from each package
+![AltText](PackageRevunueBarChart.jpg)
+
+****Functions****
 
