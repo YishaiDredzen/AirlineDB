@@ -446,6 +446,8 @@ JOIN Ticket T ON S.FlightNumber = T.FlightNumber AND S.SeatNumber = T.SeatNumber
 WHERE T.Status = 'Booked';
 ```
 
+The detailed log of the query runtimes can be seen [here](Stage3QueriesTiming.log).
+
 Query timing for the stage 3 queries:
 
 | Query | Execution Time (ms) |
