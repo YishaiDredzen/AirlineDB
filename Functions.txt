@@ -1,0 +1,136 @@
+--Function 1: Lists flights departing on a specified date along with the number of available seats by subtracting the count of booked tickets from the flight capacity.
+
+
+CREATE OR REPLACE FUNCTION available_flights_by_date(flight_date DATE)
+RETURNS TABLE (
+    FlightNumber INT,
+    DepartureLocation VARCHAR,
+    ArrivalLocation VARCHAR,
+    DepartureTime TIMESTAMP,
+    ArrivalTime TIMESTAMP,
+    AvailableSeats INT
+) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT 
+        f.FlightNumber, 
+        f.DepartureLocation, 
+        f.ArrivalLocation, 
+        f.DepartureTime, 
+        f.ArrivalTime, 
+        (f.Capacity - COUNT(t.TicketNumber))::INT AS AvailableSeats
+    FROM 
+        Flight f
+    LEFT JOIN 
+        Ticket t ON f.FlightNumber = t.FlightNumber
+    WHERE 
+        f.DepartureTime::date = flight_date
+    GROUP BY 
+        f.FlightNumber
+    HAVING 
+        (f.Capacity - COUNT(t.TicketNumber)) > 0;
+END;
+$$ LANGUAGE plpgsql;
+
+--Calling the function
+SELECT * FROM available_flights_by_date('2023-07-09');
+
+
+--Function 2: Function returning all flights departing from New York and listing number of available seats. 
+--(Replaces Query 1 from stage 2)
+
+
+CREATE OR REPLACE FUNCTION available_flights_from_ny()
+RETURNS TABLE (
+    FlightNumber INT,
+    DepartureLocation VARCHAR,
+    ArrivalLocation VARCHAR,
+    DepartureTime TIMESTAMP,
+    ArrivalTime TIMESTAMP,
+    AvailableSeats INT
+) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT 
+        f.FlightNumber, 
+        f.DepartureLocation, 
+        f.ArrivalLocation, 
+        f.DepartureTime, 
+        f.ArrivalTime, 
+        (f.Capacity - COUNT(t.TicketNumber))::INT AS AvailableSeats
+    FROM 
+        Flight f
+    LEFT JOIN 
+        Ticket t ON f.FlightNumber = t.FlightNumber
+    WHERE 
+        f.DepartureLocation = 'New York, USA'
+    GROUP BY 
+        f.FlightNumber;
+END;
+$$ LANGUAGE plpgsql;
+
+--Query with function:
+SELECT * FROM available_flights_from_ny();
+
+--Function 3: Checks if the given seat is available
+CREATE OR REPLACE FUNCTION is_seat_available(ticket_num INT, seat_num VARCHAR)
+RETURNS BOOLEAN AS $$
+DECLARE
+    flight_num INT;
+    seat_exists BOOLEAN;
+    seat_taken BOOLEAN;
+BEGIN
+    -- Get the flight number for the given ticket
+    SELECT FlightNumber INTO flight_num
+    FROM Ticket
+    WHERE TicketNumber = ticket_num;
+    
+    -- Check if the seat exists on the flight
+    SELECT EXISTS (
+        SELECT 1
+        FROM Seat
+        WHERE FlightNumber = flight_num
+        AND SeatNumber = seat_num
+    ) INTO seat_exists;
+    
+    -- Check if the seat is already taken by another ticket on the same flight
+    SELECT EXISTS (
+        SELECT 1
+        FROM Ticket
+        WHERE FlightNumber = flight_num
+        AND SeatNumber = seat_num
+    ) INTO seat_taken;
+
+    -- Return true if the seat exists and is not taken, otherwise false
+    RETURN seat_exists AND NOT seat_taken;
+END;
+$$ LANGUAGE plpgsql;
+
+--Usage in Query:
+UPDATE Ticket
+SET SeatNumber = '12A'
+WHERE TicketNumber = 1
+AND is_seat_available(1, '12A');
+
+
+--Function 4: Get list of all booking details with flight details (Replace Query 2 of stage 3)
+
+CREATE OR REPLACE FUNCTION get_booking_details()
+RETURNS TABLE (
+    BookingID INT,
+    BookingDate DATE,
+    FlightNumber INT,
+    DepartureLocation VARCHAR,
+    ArrivalLocation VARCHAR
+) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT B.BookingID, B.BookingDate, F.FlightNumber, F.DepartureLocation, F.ArrivalLocation
+    FROM Booking B
+    JOIN Ticket T ON B.TicketNumber = T.TicketNumber
+    JOIN Flight F ON T.FlightNumber = F.FlightNumber;
+END;
+$$ LANGUAGE plpgsql;
+
+--Usage
+SELECT * FROM get_booking_details();
