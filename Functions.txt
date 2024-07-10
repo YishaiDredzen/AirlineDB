@@ -72,7 +72,7 @@ $$ LANGUAGE plpgsql;
 --Query with function:
 SELECT * FROM available_flights_from_ny();
 
---Function 3: Checks if the given seat is available
+--Function 3: Checks if the given seat is available (Replaces part of query 8, updating seat number if seat is available, in previous stage)
 CREATE OR REPLACE FUNCTION is_seat_available(ticket_num INT, seat_num VARCHAR)
 RETURNS BOOLEAN AS $$
 DECLARE
