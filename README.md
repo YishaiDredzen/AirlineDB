@@ -1063,3 +1063,24 @@ WHERE FlightNumber = '1001';
 ```
 
 The timing and log for these queries can be found [here](Stage4Queries.log).
+
+
+****ERD and DSSD Diagrams****
+
+Our original ERD:
+[](ERD.jpg)
+
+ScheduleDB original ERD:
+[](SchedulingERD.jpg)
+
+Our merged ERD:
+[](MergedERD.jpg)
+
+Our original DSD:
+[](ERD.jpg)
+
+ScheduleDB original DSD:
+[](SchedulingERD.jpg)
+
+Our merged DSD:
+[](MergedERD.jpg)
