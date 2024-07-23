@@ -898,7 +898,168 @@ To call the function, here is a simple example:
 SELECT * FROM get_booking_details();
 ```
 
+****Stage 4****
+For this stage, we integrated our database into another team's database. Their database dealt with flight scheduling and so there was some obvious overlap between our data, namely our flight information, arrival locations and departure locations.
+
+We chose to use Postgres FDW (Forward Data Wrapping) and a third database to help merge the two as well as to keep our original as is. 
+
+**Setting up the new database:**
+After restoring the database using the other team's script for restoring the database (which will now be known as ScheduleDB, create a third database:
+Run the following in command line:
+```
+psql -U postgres
+```
+Then in the psql console, create the database:
+```
+CREATE DATABASE "MergedDB";
+```
+
+**Merging the Database** 
+
+After the database has been created, set up FDW:
+```
+CREATE EXTENSION postgres_fdw;
+```
+
+Create the foreign servers, namely our original database and the other team's database:
+```
+CREATE SERVER airlinedb_server
+FOREIGN DATA WRAPPER postgres_fdw
+OPTIONS (host 'localhost', dbname 'airlinedb', port '5432');
+
+CREATE SERVER scheduledb_server
+FOREIGN DATA WRAPPER postgres_fdw
+OPTIONS (host 'localhost', dbname 'ScheduleDB', port '5432');
+```
+
+We now create user mappings from the foreign servers to our database: (NOTE: change the password to fit your local postgres password that was set when setting up postgres)
+```
+CREATE USER MAPPING FOR postgres
+SERVER airlinedb_server
+OPTIONS (user 'postgres', password 'password');
+
+CREATE USER MAPPING FOR postgres
+SERVER scheduledb_server
+OPTIONS (user 'postgres', password 'password');
+```
+
+Creating the schemas:
+```
+CREATE SCHEMA airlinedb_schema;
+CREATE SCHEMA schedule_schema;
+```
+
+Now, the foreign schema need to be imported:
+```
+IMPORT FOREIGN SCHEMA public
+FROM SERVER airlinedb_server
+INTO airlinedb_schema;
+
+IMPORT FOREIGN SCHEMA public
+FROM SERVER scheduledb_server
+INTO schedule_schema;
+```
+
+We now create the tables using this [script](MergedTablesSQL.sql) which will create the enums from both databases, as well as the merged schema.
+The last table created is a flight lookup table to map our flightnumbers to the flightnumbers in ScheduleDB, as we started our IDs from different values.
+To get the data from the foreign tables into our tables, we used insert statements, these can be found [here](MergeInsertStatements.sql).
+
+**Views**
+
+This view will show basic flight details and aircraft information. This view would be used by crew members to see when there next flight is and to where they would be flying to:
+```
+CREATE VIEW CrewFlightView AS
+SELECT
+    f.FlightNumber,
+    f.DepartureTime,
+    f.ArrivalTime,
+    a.AircraftID,
+    a.AircraftType
+FROM
+    flight f
+    JOIN aircraft a ON f.AircraftID = a.AircraftID;
+```
+
+To test the view, here are some SQL statements:
+Shows flight details and aircraft information where the Boeing 737:
+```
+SELECT * FROM CrewFlightView WHERE AircraftType = 'Boeing 737';
+```
 
 
 
+This view will integrate data from passenger, booking, and flight tables to show passenger booking details and associated flight information. This could be used by the airport sand car rental staf to ensure the passenger is who they are and the correct cars are being rented out and flights being boarded by correct passengers:
+```
+CREATE VIEW PassengerBookingView AS
+SELECT 
+    p.PassengerID,
+    p.Name AS PassengerName,
+    b.BookingID,
+    b.BookingDate,
+    f.FlightNumber,
+    f.DepartureTime,
+    f.ArrivalTime,
+    b.Status AS BookingStatus
+FROM 
+    passenger p
+    JOIN booking b ON p.PassengerID = b.PassengerID
+    JOIN ticket t ON b.TicketNumber = t.TicketNumber
+    JOIN flight f ON t.FlightNumber = f.FlightNumber;
+```
 
+Shows the passenger, booking and flight details of confirmed bookings:
+```
+SELECT * FROM PassengerBookingView WHERE BookingStatus = 'Confirmed';
+```
+
+Inserts a Booking for a passenger whose ID is 239599632 and other booking details:
+```
+INSERT INTO booking (BookingID, BookingDate, PassengerID, Status, Cost, TicketNumber)
+VALUES (12345, '2024-07-24 12:00:00', 239599632, 'Confirmed', 100.00, 4001);
+```
+Updates the booking status to 'Cancelled' with BookingID 3001:
+```
+UPDATE booking 
+SET Status = 'Cancelled' 
+WHERE BookingID = 3001;
+```
+This statement deletes the booking with ID 3001:
+```
+DELETE FROM booking 
+WHERE BookingID = 3001;
+```
+
+The logs for these statements can be found [here]().
+
+****Additional Queries****
+
+On CrewFlightView:
+Shows the number of flights each type of aircraft has flown:
+```
+SELECT AircraftType, COUNT(*) AS NumberOfFlights 
+FROM CrewFlightView 
+GROUP BY AircraftType;
+```
+
+Shows the information in CrewFlightView for flights that departed after midnight on 23 July 2024:
+```
+SELECT * 
+FROM CrewFlightView 
+WHERE DepartureTime > '2024-07-23 00:00:00';
+```
+
+Shows how many bookings each passenger has made based on their names:
+```
+SELECT PassengerName, COUNT(*) AS NumberOfBookings 
+FROM PassengerBookingView 
+GROUP BY PassengerName;
+```
+
+Shows the passenger and flight details for flight number 1001:
+```
+SELECT * 
+FROM PassengerBookingView 
+WHERE FlightNumber = '1001';
+```
+
+The timing and log for these queries can be found [here](Stage4Queries.log).
