@@ -1068,19 +1068,19 @@ The timing and log for these queries can be found [here](Stage4Queries.log).
 ****ERD and DSSD Diagrams****
 
 Our original ERD:
-[](ERD.jpg)
+![](ERD.jpg)
 
 ScheduleDB original ERD:
-[](SchedulingERD.jpg)
+![](SchedulingERD.jpg)
 
 Our merged ERD:
-[](MergedERD.jpg)
+![](MergedERD.jpg)
 
 Our original DSD:
-[](ERD.jpg)
+![](DSD.jpg)
 
 ScheduleDB original DSD:
-[](SchedulingERD.jpg)
+![](SchedulingDSD.jpg)
 
 Our merged DSD:
-[](MergedERD.jpg)
+![](MergedDSD.jpg)
