@@ -1,0 +1,151 @@
+EXPLAIN ANALYZE
+SELECT * FROM CrewFlightView WHERE AircraftType = 'Boeing 737';
+
+                                                      QUERY PLAN
+----------------------------------------------------------------------------------------------------------------------
+ Hash Join  (cost=65.98..454.26 rows=404 width=28) (actual time=0.996..5.531 rows=431 loops=1)
+   Hash Cond: (a.aircraftid = f.aircraftid)
+   ->  Seq Scan on aircraft a  (cost=0.00..359.00 rows=4039 width=8) (actual time=0.030..3.543 rows=4039 loops=1)
+         Filter: (aircrafttype = 'Boeing 737'::aircraft_type)
+         Rows Removed by Filter: 15961
+   ->  Hash  (cost=40.99..40.99 rows=1999 width=24) (actual time=0.950..0.970 rows=1999 loops=1)
+         Buckets: 2048  Batches: 1  Memory Usage: 134kB
+         ->  Seq Scan on flight f  (cost=0.00..40.99 rows=1999 width=24) (actual time=0.014..0.445 rows=1999 loops=1)
+ Planning Time: 0.466 ms
+ Execution Time: 5.603 ms
+(10 rows)
+
+
+
+
+EXPLAIN ANALYZE
+SELECT * FROM PassengerBookingView WHERE BookingStatus = 'Confirmed';
+
+                                                              QUERY PLAN
+----------------------------------------------------------------------------------------------------------------------------------------
+ Hash Join  (cost=3559.52..5245.87 rows=25020 width=50) (actual time=24.639..55.725 rows=24959 loops=1)
+   Hash Cond: (t.flightnumber = f.flightnumber)
+   ->  Hash Join  (cost=3493.54..5114.07 rows=25020 width=34) (actual time=24.272..49.874 rows=24959 loops=1)
+         Hash Cond: (b.ticketnumber = t.ticketnumber)
+         ->  Hash Join  (cost=308.02..1862.87 rows=25020 width=34) (actual time=1.878..17.649 rows=24959 loops=1)
+               Hash Cond: (b.passengerid = p.passengerid)
+               ->  Seq Scan on booking b  (cost=0.00..1489.14 rows=25020 width=20) (actual time=0.011..9.174 rows=24959 loops=1)
+                     Filter: (status = 'Confirmed'::booking_status)
+                     Rows Removed by Filter: 50012
+               ->  Hash  (cost=183.01..183.01 rows=10001 width=18) (actual time=1.826..1.827 rows=10002 loops=1)
+                     Buckets: 16384  Batches: 1  Memory Usage: 620kB
+                     ->  Seq Scan on passenger p  (cost=0.00..183.01 rows=10001 width=18) (actual time=0.006..0.802 rows=10002 loops=1)
+         ->  Hash  (cost=1935.23..1935.23 rows=100023 width=8) (actual time=22.230..22.231 rows=100023 loops=1)
+               Buckets: 131072  Batches: 1  Memory Usage: 4932kB
+               ->  Seq Scan on ticket t  (cost=0.00..1935.23 rows=100023 width=8) (actual time=0.010..10.422 rows=100023 loops=1)
+   ->  Hash  (cost=40.99..40.99 rows=1999 width=20) (actual time=0.361..0.362 rows=1999 loops=1)
+         Buckets: 2048  Batches: 1  Memory Usage: 126kB
+         ->  Seq Scan on flight f  (cost=0.00..40.99 rows=1999 width=20) (actual time=0.014..0.180 rows=1999 loops=1)
+ Planning Time: 0.327 ms
+ Execution Time: 57.303 ms
+(20 rows)
+
+
+
+
+
+EXPLAIN ANALYZE 
+SELECT AircraftType, COUNT(*) AS NumberOfFlights 
+FROM CrewFlightView 
+GROUP BY AircraftType;
+
+                                                        QUERY PLAN
+---------------------------------------------------------------------------------------------------------------------------
+ HashAggregate  (cost=529.96..530.01 rows=5 width=12) (actual time=4.013..4.015 rows=5 loops=1)
+   Group Key: a.aircrafttype
+   Batches: 1  Memory Usage: 24kB
+   ->  Hash Join  (cost=65.98..519.97 rows=1999 width=4) (actual time=0.426..3.720 rows=1999 loops=1)
+         Hash Cond: (a.aircraftid = f.aircraftid)
+         ->  Seq Scan on aircraft a  (cost=0.00..309.00 rows=20000 width=8) (actual time=0.014..1.191 rows=20000 loops=1)
+         ->  Hash  (cost=40.99..40.99 rows=1999 width=4) (actual time=0.397..0.397 rows=1999 loops=1)
+               Buckets: 2048  Batches: 1  Memory Usage: 87kB
+               ->  Seq Scan on flight f  (cost=0.00..40.99 rows=1999 width=4) (actual time=0.009..0.206 rows=1999 loops=1)
+ Planning Time: 0.304 ms
+ Execution Time: 4.062 ms
+(11 rows)
+
+
+
+EXPLAIN ANALYZE 
+SELECT * 
+FROM CrewFlightView 
+WHERE DepartureTime > '2024-07-23 00:00:00';
+
+                                                     QUERY PLAN
+--------------------------------------------------------------------------------------------------------------------
+ Hash Join  (cost=56.85..499.54 rows=869 width=28) (actual time=0.925..4.122 rows=871 loops=1)
+   Hash Cond: (a.aircraftid = f.aircraftid)
+   ->  Seq Scan on aircraft a  (cost=0.00..309.00 rows=20000 width=8) (actual time=0.022..1.181 rows=20000 loops=1)
+   ->  Hash  (cost=45.99..45.99 rows=869 width=24) (actual time=0.462..0.463 rows=871 loops=1)
+         Buckets: 1024  Batches: 1  Memory Usage: 60kB
+         ->  Seq Scan on flight f  (cost=0.00..45.99 rows=869 width=24) (actual time=0.028..0.322 rows=871 loops=1)
+               Filter: (departuretime > '2024-07-23 00:00:00'::timestamp without time zone)
+               Rows Removed by Filter: 1128
+ Planning Time: 0.392 ms
+ Execution Time: 4.210 ms
+(10 rows)
+
+
+EXPLAIN ANALYZE 
+SELECT PassengerName, COUNT(*) AS NumberOfBookings 
+FROM PassengerBookingView 
+GROUP BY PassengerName;
+
+                                                                  QUERY PLAN
+
+----------------------------------------------------------------------------------------------------------------------------------------------
+ HashAggregate  (cost=5826.99..5921.00 rows=9401 width=22) (actual time=125.667..127.207 rows=9344 loops=1)
+   Group Key: p.name
+   Batches: 1  Memory Usage: 1169kB
+   ->  Hash Join  (cost=3559.52..5452.14 rows=74971 width=14) (actual time=26.079..102.856 rows=74971 loops=1)
+         Hash Cond: (t.flightnumber = f.flightnumber)
+         ->  Hash Join  (cost=3493.54..5188.94 rows=74971 width=18) (actual time=25.728..87.160 rows=74971 loops=1)
+               Hash Cond: (b.ticketnumber = t.ticketnumber)
+               ->  Hash Join  (cost=308.02..1806.61 rows=74971 width=18) (actual time=2.736..35.537 rows=74971 loops=1)
+                     Hash Cond: (b.passengerid = p.passengerid)
+                     ->  Seq Scan on booking b  (cost=0.00..1301.71 rows=74971 width=8) (actual time=0.034..13.988 rows=74971 loops=1)
+                     ->  Hash  (cost=183.01..183.01 rows=10001 width=18) (actual time=2.631..2.631 rows=10002 loops=1)
+                           Buckets: 16384  Batches: 1  Memory Usage: 634kB
+                           ->  Seq Scan on passenger p  (cost=0.00..183.01 rows=10001 width=18) (actual time=0.009..0.951 rows=10002 loops=1)
+               ->  Hash  (cost=1935.23..1935.23 rows=100023 width=8) (actual time=22.713..22.714 rows=100023 loops=1)
+                     Buckets: 131072  Batches: 1  Memory Usage: 4932kB
+                     ->  Seq Scan on ticket t  (cost=0.00..1935.23 rows=100023 width=8) (actual time=0.033..10.664 rows=100023 loops=1)
+         ->  Hash  (cost=40.99..40.99 rows=1999 width=4) (actual time=0.327..0.328 rows=1999 loops=1)
+               Buckets: 2048  Batches: 1  Memory Usage: 87kB
+               ->  Seq Scan on flight f  (cost=0.00..40.99 rows=1999 width=4) (actual time=0.012..0.157 rows=1999 loops=1)
+ Planning Time: 1.080 ms
+ Execution Time: 129.997 ms
+(21 rows)
+
+
+EXPLAIN ANALYZE 
+SELECT * 
+FROM PassengerBookingView 
+WHERE FlightNumber = '1001';
+
+                                                                QUERY PLAN
+
+------------------------------------------------------------------------------------------------------------------------------------------
+ Nested Loop  (cost=2187.08..3716.62 rows=73 width=50) (actual time=19.080..41.007 rows=75 loops=1)
+   ->  Index Scan using flight_pkey on flight f  (cost=0.28..8.29 rows=1 width=20) (actual time=0.559..0.561 rows=1 loops=1)
+         Index Cond: (flightnumber = 1001)
+   ->  Nested Loop  (cost=2186.80..3707.59 rows=73 width=34) (actual time=18.516..40.421 rows=75 loops=1)
+         ->  Hash Join  (cost=2186.51..3685.03 rows=73 width=20) (actual time=17.707..36.762 rows=75 loops=1)
+               Hash Cond: (b.ticketnumber = t.ticketnumber)
+               ->  Seq Scan on booking b  (cost=0.00..1301.71 rows=74971 width=20) (actual time=0.036..12.840 rows=74971 loops=1)
+               ->  Hash  (cost=2185.29..2185.29 rows=98 width=8) (actual time=16.926..16.927 rows=102 loops=1)
+                     Buckets: 1024  Batches: 1  Memory Usage: 12kB
+                     ->  Seq Scan on ticket t  (cost=0.00..2185.29 rows=98 width=8) (actual time=0.273..16.871 rows=102 loops=1)
+                           Filter: (flightnumber = 1001)
+                           Rows Removed by Filter: 99921
+         ->  Index Scan using passenger_pkey on passenger p  (cost=0.29..0.31 rows=1 width=18) (actual time=0.048..0.048 rows=1 loops=75)
+               Index Cond: (passengerid = b.passengerid)
+ Planning Time: 0.724 ms
+ Execution Time: 42.110 ms
+(16 rows)
+
