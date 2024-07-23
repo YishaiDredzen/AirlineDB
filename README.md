@@ -985,10 +985,25 @@ Shows flight details and aircraft information where the Boeing 737:
 ```
 SELECT * FROM CrewFlightView WHERE AircraftType = 'Boeing 737';
 ```
+Inserts an aircraft into the aircraft table:
+```
+INSERT INTO Aircraft (AircraftID, AircraftType, CurrentStatus)
+VALUES (1, 'Boeing 737', 'Parked');
+```
+Updates the current status of aircraft ID 1 to 'In flight':
+```
+UPDATE Aircraft
+SET CurrentStatus = 'In flight'
+WHERE AircraftID = 1;
+```
+Deletes an aircraft with specified ID:
+```
+DELETE FROM Aircraft WHERE AircraftID = 1;
+```
 
 
-
-This view will integrate data from passenger, booking, and flight tables to show passenger booking details and associated flight information. This could be used by the airport sand car rental staf to ensure the passenger is who they are and the correct cars are being rented out and flights being boarded by correct passengers:
+This view will integrate data from passenger, booking, and flight tables to show passenger booking details and associated flight information. 
+This could be used by the airport sand car rental staf to ensure the passenger is who they are and the correct cars are being rented out and flights being boarded by correct passengers:
 ```
 CREATE VIEW PassengerBookingView AS
 SELECT 
