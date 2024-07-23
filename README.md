@@ -1066,12 +1066,16 @@ The timing and log for these queries can be found [here](Stage4Queries.log).
 
 
 ****ERD and DSSD Diagrams****
+The major overlap between our databases was between our Passenger and Flights. 
+We merged their passenger entity with ours allowing our ticket entity to replace their ticket attribute.
+Through our Flight lookup table, we merged our flight tables and linked their entities to our flight entity through the lookup table.
 
 Our original ERD:
 ![](ERD.jpg)
 
 ScheduleDB original ERD:
 ![](SchedulingERD.jpg)
+
 
 Our merged ERD:
 ![](MergedERD.jpg)
