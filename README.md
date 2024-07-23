@@ -898,7 +898,7 @@ To call the function, here is a simple example:
 SELECT * FROM get_booking_details();
 ```
 
-****Stage 4****
+# Stage 4
 For this stage, we integrated our database into another team's database. Their database dealt with flight scheduling and so there was some obvious overlap between our data, namely our flight information, arrival locations and departure locations.
 
 We chose to use Postgres FDW (Forward Data Wrapping) and a third database to help merge the two as well as to keep our original as is. 
@@ -914,7 +914,7 @@ Then in the psql console, create the database:
 CREATE DATABASE "MergedDB";
 ```
 
-**Merging the Database** 
+## Merging the Database 
 
 After the database has been created, set up FDW:
 ```
@@ -964,7 +964,7 @@ We now create the tables using this [script](MergedTablesSQL.sql) which will cre
 The last table created is a flight lookup table to map our flightnumbers to the flightnumbers in ScheduleDB, as we started our IDs from different values.
 To get the data from the foreign tables into our tables, we used insert statements, these can be found [here](MergeInsertStatements.sql).
 
-**Views**
+## Views
 
 This view will show basic flight details and aircraft information. This view would be used by crew members to see when there next flight is and to where they would be flying to:
 ```
@@ -985,10 +985,25 @@ Shows flight details and aircraft information where the Boeing 737:
 ```
 SELECT * FROM CrewFlightView WHERE AircraftType = 'Boeing 737';
 ```
+Inserts an aircraft into the aircraft table:
+```
+INSERT INTO Aircraft (AircraftID, AircraftType, CurrentStatus)
+VALUES (1, 'Boeing 737', 'Parked');
+```
+Updates the current status of aircraft ID 1 to 'In flight':
+```
+UPDATE Aircraft
+SET CurrentStatus = 'In flight'
+WHERE AircraftID = 1;
+```
+Deletes an aircraft with specified ID:
+```
+DELETE FROM Aircraft WHERE AircraftID = 1;
+```
 
 
-
-This view will integrate data from passenger, booking, and flight tables to show passenger booking details and associated flight information. This could be used by the airport sand car rental staf to ensure the passenger is who they are and the correct cars are being rented out and flights being boarded by correct passengers:
+This view will integrate data from passenger, booking, and flight tables to show passenger booking details and associated flight information. 
+This could be used by the airport sand car rental staf to ensure the passenger is who they are and the correct cars are being rented out and flights being boarded by correct passengers:
 ```
 CREATE VIEW PassengerBookingView AS
 SELECT 
@@ -1031,7 +1046,7 @@ WHERE BookingID = 3001;
 
 The logs for these statements can be found [here]().
 
-****Additional Queries****
+## Additional Queries
 
 On CrewFlightView:
 Shows the number of flights each type of aircraft has flown:
@@ -1063,3 +1078,28 @@ WHERE FlightNumber = '1001';
 ```
 
 The timing and log for these queries can be found [here](Stage4Queries.log).
+
+
+### ERD and DSD Diagrams
+The major overlap between our databases was between our Passenger and Flights. 
+We merged their passenger entity with ours allowing our ticket entity to replace their ticket attribute.
+Through our Flight lookup table, we merged our flight tables and linked their entities to our flight entity through the lookup table.
+
+Our original ERD:
+![](ERD.jpg)
+
+ScheduleDB original ERD:
+![](SchedulingERD.jpg)
+
+
+Our merged ERD:
+![](MergedERD.jpg)
+
+Our original DSD:
+![](DSD.jpg)
+
+ScheduleDB original DSD:
+![](SchedulingDSD.jpg)
+
+Our merged DSD:
+![](MergedDSD.jpg)
