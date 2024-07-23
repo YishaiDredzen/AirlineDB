@@ -1,6 +1,18 @@
 --Shows flight details and aircraft information where the Boeing 737:
 SELECT * FROM CrewFlightView WHERE AircraftType = 'Boeing 737';
 
+--Inserts an aircraft into the aircraft table:
+INSERT INTO Aircraft (AircraftID, AircraftType, CurrentStatus)
+VALUES (1, 'Boeing 737', 'Parked');
+
+--Updates the current status of aircraft ID 1 to 'In flight':
+UPDATE Aircraft
+SET CurrentStatus = 'In flight'
+WHERE AircraftID = 1;
+
+--Deletes an aircraft with specified ID:
+DELETE FROM Aircraft WHERE AircraftID = 1;
+
 --Shows the passenger, booking and flight details of confirmed bookings:
 SELECT * FROM PassengerBookingView WHERE BookingStatus = 'Confirmed';
 
