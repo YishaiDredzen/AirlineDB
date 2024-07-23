@@ -981,7 +981,7 @@ FROM
 ```
 
 To test the view, here are some SQL statements:
-Shows flight details and aircraft information where the Boeing 737:
+1) Shows flight details and aircraft information where the Boeing 737:
 ```
 SELECT * FROM CrewFlightView WHERE AircraftType = 'Boeing 737';
 ```
@@ -1022,7 +1022,7 @@ FROM
     JOIN flight f ON t.FlightNumber = f.FlightNumber;
 ```
 
-Shows the passenger, booking and flight details of confirmed bookings:
+2) Shows the passenger, booking and flight details of confirmed bookings:
 ```
 SELECT * FROM PassengerBookingView WHERE BookingStatus = 'Confirmed';
 ```
@@ -1049,28 +1049,28 @@ The logs for these statements can be found [here]().
 ## Additional Queries
 
 On CrewFlightView:
-Shows the number of flights each type of aircraft has flown:
+3) Shows the number of flights each type of aircraft has flown:
 ```
 SELECT AircraftType, COUNT(*) AS NumberOfFlights 
 FROM CrewFlightView 
 GROUP BY AircraftType;
 ```
 
-Shows the information in CrewFlightView for flights that departed after midnight on 23 July 2024:
+4) Shows the information in CrewFlightView for flights that departed after midnight on 23 July 2024:
 ```
 SELECT * 
 FROM CrewFlightView 
 WHERE DepartureTime > '2024-07-23 00:00:00';
 ```
 
-Shows how many bookings each passenger has made based on their names:
+5) Shows how many bookings each passenger has made based on their names:
 ```
 SELECT PassengerName, COUNT(*) AS NumberOfBookings 
 FROM PassengerBookingView 
 GROUP BY PassengerName;
 ```
 
-Shows the passenger and flight details for flight number 1001:
+6) Shows the passenger and flight details for flight number 1001:
 ```
 SELECT * 
 FROM PassengerBookingView 
@@ -1078,6 +1078,16 @@ WHERE FlightNumber = '1001';
 ```
 
 The timing and log for these queries can be found [here](Stage4Queries.log).
+
+Here are the timings in a table for the SELECT queries:
+| Query | Timing (ms) |
+|-------|-------------|
+| 1     | 5.603       |
+| 2     | 57.303      |
+| 3     | 4.062       |
+| 4     | 4.210       |
+| 5     | 129.997     |
+| 6     | 42.110      |
 
 
 ### ERD and DSD Diagrams
