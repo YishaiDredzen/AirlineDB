@@ -1044,8 +1044,6 @@ DELETE FROM booking
 WHERE BookingID = 3001;
 ```
 
-The logs for these statements can be found [here]().
-
 ## Additional Queries
 
 On CrewFlightView:
@@ -1077,7 +1075,7 @@ FROM PassengerBookingView
 WHERE FlightNumber = '1001';
 ```
 
-The timing and log for these queries can be found [here](Stage4Queries.log).
+The timing and log for these queries can be found [here](Stage4Queries.log) and in full detail [here](Stage4QueriesTiming.log).
 
 Here are the timings in a table for the SELECT queries:
 | Query | Timing (ms) |
